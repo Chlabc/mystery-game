@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Experiment Failure Mystery</title>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Lab Experiment Failure Mystery</h1>
+      <p>
+        You are investigating a failed experiment at NovaChem Research Lab.
+        Something went wrong during a late-night reactor test, and the records do not match.
+        Search for clues, question the suspects, and solve the case.
+      </p>
+      <p id="progressText">Clues found: 0 / 5</p>
+    </header>
+
+    <main>
+      <section id="search-lab">
+        <h2>1. Search the Lab</h2>
+        <p>Click each area to uncover clues.</p>
+
+        <div class="lab-grid">
+          <button class="clue-btn" data-clue="computer">💻 Computer Terminal</button>
+          <button class="clue-btn" data-clue="locker">🔐 Storage Locker</button>
+          <button class="clue-btn" data-clue="camera">📹 Security Camera</button>
+          <button class="clue-btn" data-clue="sample">🧪 Chemical Sample</button>
+          <button class="clue-btn" data-clue="logbook">📓 Lab Logbook</button>
+        </div>
+
+        <div id="clueDisplay">
+          <h3>Clue Details</h3>
+          <p>Select a lab area to reveal a clue.</p>
+        </div>
+      </section>
+
+      <section id="interview-suspects">
+        <h2>2. Interview Suspects</h2>
+        <p>Select a suspect to read their statement.</p>
+
+        <div class="suspect-grid">
+          <button class="suspect-btn" data-suspect="drlee">
+            Dr. Lee<br />
+            <small>Lead Scientist</small>
+          </button>
+
+          <button class="suspect-btn" data-suspect="maya">
+            Maya<br />
+            <small>Lab Assistant</small>
+          </button>
+
+          <button class="suspect-btn" data-suspect="owen">
+            Owen<br />
+            <small>Safety Officer</small>
+          </button>
+        </div>
+
+        <div id="suspectDisplay">
+          <h3>Suspect Statement</h3>
+          <p>Select a suspect to view their statement.</p>
+        </div>
+      </section>
+
+      <section id="solve-case">
+        <h2>3. Solve the Mystery</h2>
+        <p>Answer the questions once you have reviewed the clues.</p>
+
+        <div class="question-group">
+          <h3>Question 1: What caused the failure?</h3>
+          <button class="answer-btn" data-question="q1" data-value="a">
+            A cooling system glitch caused random overheating.
+          </button>
+          <button class="answer-btn" data-question="q1" data-value="b">
+            The wrong chemical was deliberately used to hide a mistake.
+          </button>
+          <button class="answer-btn" data-question="q1" data-value="c">
+            A power outage corrupted the experiment settings.
+          </button>
+        </div>
+
+        <div class="question-group">
+          <h3>Question 2: Who was most responsible?</h3>
+          <button class="answer-btn" data-question="q2" data-value="a">Dr. Lee</button>
+          <button class="answer-btn" data-question="q2" data-value="b">Maya</button>
+          <button class="answer-btn" data-question="q2" data-value="c">Owen</button>
+        </div>
+
+        <div class="question-group">
+          <h3>Question 3: Why did they do it?</h3>
+          <button class="answer-btn" data-question="q3" data-value="a">
+            To sabotage the company for a competitor.
+          </button>
+          <button class="answer-btn" data-question="q3" data-value="b">
+            To cover up that the experiment protocol was skipped.
+          </button>
+          <button class="answer-btn" data-question="q3" data-value="c">
+            To steal research data during the chaos.
+          </button>
+        </div>
+
+        <button id="submitBtn">Submit Case Report</button>
+      </section>
+
+      <section id="resultBox">
+        <h2>Case Result</h2>
+        <p>Your investigation result will appear here.</p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
