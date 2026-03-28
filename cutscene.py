@@ -11,6 +11,7 @@ Features:
 import pygame
 import sys
 from game_mechanics import initialize_suspects, check_verdict
+import emoji
 
 # --- Initialization ---
 pygame.init()
