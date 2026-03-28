@@ -235,6 +235,8 @@ def run_interrogation():
     game_over = False
     verdict_result = None
     verdict_timer = 0.0
+    interrogation_timer = 0.0  # Timer for 5 minute interrogation
+    INTERROGATION_TIME = 300.0  # 5 minutes in seconds
     
     running = True
     
@@ -281,6 +283,17 @@ def run_interrogation():
         if game_over:
             verdict_timer += delta_time
         
+        # Track interrogation timer
+        if not game_over:
+            interrogation_timer += delta_time
+            
+            # Check if time is up
+            if interrogation_timer >= INTERROGATION_TIME:
+                dialogue_history.append(("System", "⏰ Time's up! You ran out of time to solve the case."))
+                game_over = True
+                verdict_result = (False, "Time's up!")
+                verdict_timer = 0.0
+        
         # --- Rendering ---
         screen.blit(background, (0, 0))
         
@@ -313,6 +326,19 @@ def run_interrogation():
             player_prompt = "> Player: " + player_input
             player_prompt_surf = font_dialogue.render(player_prompt, True, WHITE)
             screen.blit(player_prompt_surf, (dialogue_box_rect.x + 10, y_offset))
+        
+        # Draw timer in top right corner
+        remaining_time = max(0, INTERROGATION_TIME - interrogation_timer)
+        minutes = int(remaining_time) // 60
+        seconds = int(remaining_time) % 60
+        timer_text = f"{minutes:02d}:{seconds:02d}"
+        
+        font_timer = pygame.font.SysFont("courier", 32, bold=True)
+        timer_color = GOLD if remaining_time > 30 else (255, 100, 100) if remaining_time > 0 else (255, 0, 0)
+        timer_surf = font_timer.render(timer_text, True, timer_color)
+        timer_rect = timer_surf.get_rect()
+        timer_rect.topright = (SCREEN_WIDTH - 20, 20)
+        screen.blit(timer_surf, timer_rect)
         
         # If game over, show exit message after 3 seconds
         if game_over and verdict_timer > 3.0:
