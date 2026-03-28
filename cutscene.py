@@ -24,10 +24,9 @@ FPS = 60
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GOLD = (212, 175, 55)
-TEXTBOX_ALPHA = 200
+TEXTBOX_ALPHA = 200 # setting transparency
 
-# Typewriter settings
-CHARS_PER_SECOND = 60  # Adjust this to control typing speed (higher = faster)
+# Scene transition settings
 PAUSE_BETWEEN_SCENES = 5000  # milliseconds (5 seconds)
 
 # Scene data: (image_file, text_content)
@@ -135,10 +134,7 @@ def draw_next_button():
 def run_cutscene():
     """Main cutscene loop."""
     scene_index = 0
-    chars_displayed = 0
     text_fully_shown = False
-    time_text_finished = 0
-    text_timer = 0.0  # Accumulates time for typewriter effect
     pause_timer = 0.0  # Accumulates pause time between scenes
     
     running = True
@@ -165,16 +161,8 @@ def run_cutscene():
                         run_interrogation()
                         return  # Exit cutscene after interrogation ends
         
-        # --- Update Typewriter Effect ---
-        if not text_fully_shown:
-            text_timer += delta_time
-            # Calculate characters to display based on accumulated time
-            chars_to_show = int(text_timer * CHARS_PER_SECOND)
-            chars_displayed = min(chars_to_show, len(text_content))
-            
-            if chars_displayed >= len(text_content):
-                text_fully_shown = True
-                pause_timer = 0.0
+        # Text is shown immediately
+        text_fully_shown = True
         
         # --- Check if should advance to next scene ---
         if text_fully_shown:
@@ -183,17 +171,14 @@ def run_cutscene():
             # Auto-advance after pause (except on last scene)
             if scene_index < len(SCENES) - 1 and pause_timer >= (PAUSE_BETWEEN_SCENES / 1000.0):
                 scene_index += 1
-                chars_displayed = 0
                 text_fully_shown = False
-                text_timer = 0.0
                 pause_timer = 0.0
         
         # --- Rendering ---
         screen.blit(background, (0, 0))
         
-        # Draw textbox with partial or full text
-        displayed_text = text_content[:chars_displayed]
-        draw_textbox_with_text(displayed_text)
+        # Draw textbox with full text
+        draw_textbox_with_text(text_content)
         
         # Draw "Next" button on final scene when text is complete
         if scene_index == len(SCENES) - 1 and text_fully_shown:
