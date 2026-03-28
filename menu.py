@@ -1,11 +1,10 @@
 import os
 import sys
 import pygame
-from cutscene import run_cutscene
 
 pygame.init()
 
-WIDTH, HEIGHT = 1200, 800
+WIDTH, HEIGHT = 1365, 768
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Lab Breakout")
 CLOCK = pygame.time.Clock()
@@ -226,52 +225,43 @@ def main():
 
     running = True
     message = ""
-    show_cutscene = False
 
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-            if not show_cutscene:
-                if play_btn.handle_event(event):
-                    show_cutscene = True
-                if instr_btn.handle_event(event):
-                    message = "Instructions clicked"
-        
-        # If showing cutscene, run it
-        if show_cutscene:
-            run_cutscene(shared_screen=SCREEN, shared_clock=CLOCK)
-            show_cutscene = False  # Return to menu after cutscene ends
-        
-        # Draw menu (only when not showing cutscene)
-        if not show_cutscene:
-            draw_background(SCREEN)
+            if play_btn.handle_event(event):
+                message = "Play clicked"
+            if instr_btn.handle_event(event):
+                message = "Instructions clicked"
 
-            # Title
-            draw_text(SCREEN, "Lab Breakout", TITLE_FONT, TEXT, (title_x, title_y))
+        draw_background(SCREEN)
 
-            # Left panel
-            draw_panel(SCREEN, left_panel_rect, bg=(20, 27, 54), radius=22)
-            play_btn.draw(SCREEN)
-            instr_btn.draw(SCREEN)
+        # Title
+        draw_text(SCREEN, "Lab Breakout", TITLE_FONT, TEXT, (title_x, title_y))
 
-            draw_note(SCREEN, note1, "CASE FILE", "An experiment went wrong.")
-            draw_note(SCREEN, note2, "OBJECTIVE", "Search for clues and escape.")
+        # Left panel
+        draw_panel(SCREEN, left_panel_rect, bg=(20, 27, 54), radius=22)
+        play_btn.draw(SCREEN)
+        instr_btn.draw(SCREEN)
 
-            draw_round_rect(SCREEN, credits_rect, (112, 114, 119), radius=8, border=3, border_color=(59, 64, 69))
-            draw_text(SCREEN, "Credits", SMALL_FONT, (240, 240, 242), (credits_rect.x + 24, credits_rect.y + 8))
-            draw_text(SCREEN, "v0.1.0a (prototype build)", TINY_FONT, MUTED, (left_panel_rect.x + 120, left_panel_rect.bottom - 18), center=False)
+        draw_note(SCREEN, note1, "CASE FILE", "An experiment went wrong.")
+        draw_note(SCREEN, note2, "OBJECTIVE", "Search for clues and escape.")
 
-            # Right visual panel
-            draw_visual_panel(SCREEN, right_panel_rect)
+        draw_round_rect(SCREEN, credits_rect, (112, 114, 119), radius=8, border=3, border_color=(59, 64, 69))
+        draw_text(SCREEN, "Credits", SMALL_FONT, (240, 240, 242), (credits_rect.x + 24, credits_rect.y + 8))
+        draw_text(SCREEN, "v0.1.0a (prototype build)", TINY_FONT, MUTED, (left_panel_rect.x + 120, left_panel_rect.bottom - 18), center=False)
 
-            # Optional status message
-            if message:
-                draw_text(SCREEN, message, SMALL_FONT, MUTED, (WIDTH - 220, HEIGHT - 36))
+        # Right visual panel
+        draw_visual_panel(SCREEN, right_panel_rect)
 
-            pygame.display.flip()
-            CLOCK.tick(60)
+        # Optional status message
+        if message:
+            draw_text(SCREEN, message, SMALL_FONT, MUTED, (WIDTH - 220, HEIGHT - 36))
+
+        pygame.display.flip()
+        CLOCK.tick(60)
 
     pygame.quit()
     sys.exit()

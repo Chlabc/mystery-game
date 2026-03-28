@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Breakout Cutscene</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg-dark: #060c1f;
+      --bg-mid: #0b1b3a;
+      --bg-light: #142c5a;
+      --panel-bg: rgba(10, 18, 39, 0.88);
+      --panel-border: #4f6fb3;
+      --panel-outer: #05070f;
+      --text: #eef3ff;
+      --muted: #b5c6ef;
+      --accent: #e9bf3f;
+      --accent-dark: #9d7b17;
+      --button-blue: #2f5fcc;
+      --button-blue-dark: #1f3f8f;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top, rgba(90, 120, 255, 0.2), transparent 30%),
+        linear-gradient(180deg, var(--bg-light) 0%, var(--bg-mid) 45%, var(--bg-dark) 100%);
+      font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
+      overflow: hidden;
+      color: var(--text);
+    }
+
+    #app {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    #app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.07) 0 2px,
+        transparent 2px 148px
+      );
+      pointer-events: none;
+      opacity: 0.5;
+      z-index: 0;
+    }
+
+    #app::after {
+      content: "";
+      position: absolute;
+      top: -18%;
+      left: 22%;
+      width: 46vw;
+      height: 46vw;
+      border-radius: 50%;
+      background: rgba(38, 71, 151, 0.22);
+      filter: blur(2px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .scene-bg {
+      position: absolute;
+      top: 44px;
+      right: 44px;
+      width: min(56vw, 860px);
+      height: calc(100vh - 128px);
+      object-fit: cover;
+      background: #02040a;
+      border-radius: 24px;
+      border: 5px solid #2d3034;
+      box-shadow: inset 0 0 0 3px #b9c1c6;
+      filter: brightness(0.62) saturate(0.72) hue-rotate(-8deg);
+      z-index: 1;
+    }
+
+    .scene-frame {
+      position: absolute;
+      top: 44px;
+      right: 44px;
+      width: min(56vw, 860px);
+      height: calc(100vh - 128px);
+      border-radius: 24px;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .scene-frame::before,
+    .scene-frame::after {
+      content: "";
+      position: absolute;
+      top: 18px;
+      height: calc(100% - 36px);
+      transform: skewX(-12deg);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .scene-frame::before {
+      right: 132px;
+      width: 84px;
+    }
+
+    .scene-frame::after {
+      right: 90px;
+      width: 26px;
+      opacity: 0.5;
+    }
+
+    .left-ui {
+      position: absolute;
+      left: 48px;
+      top: 42px;
+      width: min(34vw, 520px);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 3;
+    }
+
+    
+
+    .textbox {
+      position: relative;
+      min-height: 56vh;
+      background: linear-gradient(180deg, rgba(20, 27, 54, 0.95), rgba(14, 20, 42, 0.96));
+      border: 4px solid var(--panel-outer);
+      border-radius: 22px;
+      box-shadow: inset 0 0 0 3px var(--panel-border), 0 6px 0 rgba(0, 0, 0, 0.22);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .scene-card {
+      border-radius: 14px;
+      border: 3px solid #1a2e5a;
+      background: linear-gradient(180deg, #1f3f8f 0%, #162c63 100%);
+      padding: 14px 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      min-height: 118px;
+    }
+
+    .scene-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .textbox p {
+      margin: 0;
+      font-size: clamp(20px, 2vw, 30px);
+      line-height: 1.45;
+      white-space: pre-line;
+      color: var(--text);
+    }
+
+    .progress-wrap {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 0 4px;
+    }
+
+    .progress-dot {
+      flex: 1;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.08);
+    }
+
+    .progress-dot.active {
+      background: linear-gradient(180deg, var(--accent) 0%, #c59d24 100%);
+      border-color: var(--accent-dark);
+    }
+
+    .next-btn {
+      position: absolute;
+      left: 48px;
+      bottom: 44px;
+      width: 220px;
+      height: 64px;
+      border-radius: 14px;
+      border: 4px solid #192223;
+      background: linear-gradient(135deg, var(--button-blue) 0%, var(--button-blue) 52%, #7aa2ff 52%, #7aa2ff 66%, var(--button-blue) 66%, var(--button-blue) 100%);
+      color: white;
+      font: 700 1.35rem "Comic Sans MS", "Trebuchet MS", cursive, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.18), 0 6px 0 rgba(0,0,0,0.22);
+      display: none;
+      z-index: 4;
+    }
+
+    .next-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .next-btn:active {
+      transform: translateY(2px);
+    }
+
+    .dialogue-box {
+      position: absolute;
+      left: 48px;
+      right: 48px;
+      bottom: 40px;
+      height: min(44vh, 360px);
+      background: linear-gradient(180deg, rgba(20, 27, 54, 0.95), rgba(14, 20, 42, 0.96));
+      border: 4px solid var(--panel-outer);
+      border-radius: 22px;
+      box-shadow: inset 0 0 0 3px var(--panel-border), 0 6px 0 rgba(0, 0, 0, 0.22);
+      padding: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 5;
+    }
+
+    .history {
+      flex: 1;
+      overflow-y: auto;
+      font-family: "Courier New", monospace;
+      font-size: 18px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      color: var(--text);
+      padding-right: 6px;
+    }
+
+    .history::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .history::-webkit-scrollbar-thumb {
+      background: #365aa8;
+      border-radius: 999px;
+    }
+
+    .prompt-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: "Courier New", monospace;
+      font-size: 18px;
+      color: white;
+      border-radius: 12px;
+      border: 3px solid #1a2e5a;
+      background: linear-gradient(180deg, #1f3f8f 0%, #162c63 100%);
+      padding: 12px 14px;
+    }
+
+    .prompt-row input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font: inherit;
+    }
+
+    .timer {
+      position: absolute;
+      top: 30px;
+      right: 62px;
+      font: bold 32px "Courier New", monospace;
+      color: var(--accent);
+      display: none;
+      text-shadow: 0 0 10px rgba(0,0,0,0.6);
+      z-index: 6;
+      background: rgba(6, 12, 31, 0.72);
+      border: 3px solid #2d3034;
+      box-shadow: inset 0 0 0 2px #4f6fb3;
+      border-radius: 14px;
+      padding: 10px 14px;
+    }
+
+    .status-tag {
+      position: absolute;
+      right: 72px;
+      bottom: 64px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(233, 191, 63, 0.92);
+      color: #1e2125;
+      border: 3px solid #2d3034;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      z-index: 4;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.22);
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 980px) {
+      .scene-bg,
+      .scene-frame {
+        position: absolute;
+        left: 24px;
+        right: 24px;
+        top: 24px;
+        width: auto;
+        height: 38vh;
+      }
+
+      .left-ui {
+        left: 24px;
+        right: 24px;
+        top: calc(38vh + 42px);
+        width: auto;
+      }
+
+      .textbox {
+        min-height: 42vh;
+      }
+
+      .next-btn {
+        left: 24px;
+        bottom: 24px;
+      }
+
+      .dialogue-box {
+        left: 24px;
+        right: 24px;
+      }
+
+      .timer {
+        right: 36px;
+      }
+
+      .status-tag {
+        right: 42px;
+        bottom: auto;
+        top: calc(38vh - 22px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <img id="sceneBg" class="scene-bg" src="" alt="Scene" />
+    <div class="scene-frame"></div>
+    <div class="status-tag">Quarantine Sector</div>
+
+    <div class="left-ui">
+      <div id="cutsceneBox" class="textbox">
+        <div class="scene-card">
+          <div class="scene-label">Case Log</div>
+          <p id="sceneText"></p>
+        </div>
+        <div id="progressWrap" class="progress-wrap"></div>
+      </div>
+    </div>
+
+    <button id="nextBtn" class="next-btn">Next</button>
+
+    <div id="timer" class="timer">05:00</div>
+
+    <div id="dialogueBox" class="dialogue-box">
+      <div id="history" class="history"></div>
+      <div id="promptRow" class="prompt-row">
+        <span>&gt; Player:</span>
+        <input id="playerInput" type="text" maxlength="100" autocomplete="off" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PAUSE_BETWEEN_SCENES = 5000;
+    const INTERROGATION_TIME = 300;
+
+    const scenes = [
+      {
+        image: 'image1.jpg',
+        text: '3:03 AM\nAt this hour, the lab is silent — just the low hum of machines and the soft glow of monitors.'
+      },
+      {
+        image: 'image2.jpg',
+        text: '3:04 AM ⚠️ BIOHAZARD DETECTED. INITIATING LOCKDOWN.\nSomething inside containment has been released.'
+      },
+      {
+        image: 'image3.jpg',
+        text: "Doors slam shut across the facility. In an attempt to contain the threat, the lab's security system has locked down all exits, trapping everyone in the rooms where they are."
+      },
+      {
+        image: 'image4.jpg',
+        text: 'Everyone except one.\nIn the chaos, the individual responsible for the breach has managed to slip out of their containment area and into the main lab, where they are now hiding among the other scientists.'
+      },
+      {
+        image: 'image5.jpg',
+        text: "As the city's top detective, it's your job to interrogate the suspects and determine who is responsible for the breach before it's too late. The clock is ticking, and the fate of the city hangs in the balance."
+      }
+    ];
+
+    const dialogue = [
+      ['Suspect1', "I'm innocent"],
+      ['Suspect2', "That's not the truth"],
+      ['Suspect1', 'I swear it'],
+      ['Suspect2', "We'll see about that"]
+    ];
+
+    // Placeholder browser versions of the Python functions.
+    function initializeSuspects() {
+      return ['S1', 'S2', 'S3', 'S4', 'S5'];
+    }
+
+    function checkVerdict(code) {
+      const correct = 'S3';
+      if (code === correct) {
+        return [true, 'Correct. You identified the scientist responsible for the breach.'];
+      }
+      return [false, `Incorrect. ${code} is not the culprit.`];
+    }
+
+    const sceneBg = document.getElementById('sceneBg');
+    const sceneText = document.getElementById('sceneText');
+    const cutsceneBox = document.getElementById('cutsceneBox');
+    const nextBtn = document.getElementById('nextBtn');
+    const dialogueBox = document.getElementById('dialogueBox');
+    const historyEl = document.getElementById('history');
+    const playerInput = document.getElementById('playerInput');
+    const timerEl = document.getElementById('timer');
+    const promptRow = document.getElementById('promptRow');
+    const progressWrap = document.getElementById('progressWrap');
+    const statusTag = document.querySelector('.status-tag');
+
+    let sceneIndex = 0;
+    let sceneTimeout = null;
+    let dialogueIndex = 0;
+    let gameOver = false;
+    let interrogationRemaining = INTERROGATION_TIME;
+    let timerInterval = null;
+
+    function renderProgress(index) {
+      progressWrap.innerHTML = '';
+      scenes.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'progress-dot' + (i === index ? ' active' : '');
+        progressWrap.appendChild(dot);
+      });
+    }
+
+    function loadScene(index) {
+      const scene = scenes[index];
+      sceneBg.src = scene.image;
+      sceneText.textContent = scene.text;
+      renderProgress(index);
+      nextBtn.style.display = 'none';
+
+      if (sceneTimeout) clearTimeout(sceneTimeout);
+
+      if (index < scenes.length - 1) {
+        sceneTimeout = setTimeout(() => {
+          sceneIndex += 1;
+          loadScene(sceneIndex);
+        }, PAUSE_BETWEEN_SCENES);
+      } else {
+        nextBtn.style.display = 'block';
+      }
+    }, PAUSE_BETWEEN_SCENES);
+      } else {
+        nextBtn.style.display = 'block';
+      }
+    }
+
+    function appendHistory(speaker, text) {
+      const line = document.createElement('div');
+      line.textContent = `> ${speaker}: ${text}`;
+      historyEl.appendChild(line);
+      historyEl.scrollTop = historyEl.scrollHeight;
+    }
+
+    function updateTimer() {
+      const minutes = String(Math.floor(interrogationRemaining / 60)).padStart(2, '0');
+      const seconds = String(interrogationRemaining % 60).padStart(2, '0');
+      timerEl.textContent = `${minutes}:${seconds}`;
+
+      if (interrogationRemaining > 30) {
+        timerEl.style.color = 'rgb(212, 175, 55)';
+      } else if (interrogationRemaining > 0) {
+        timerEl.style.color = 'rgb(255, 100, 100)';
+      } else {
+        timerEl.style.color = 'rgb(255, 0, 0)';
+      }
+    }
+
+    function endInterrogation(message) {
+      gameOver = true;
+      appendHistory('System', message);
+      promptRow.classList.add('hidden');
+      setTimeout(() => {
+        alert('Interrogation complete');
+      }, 3000);
+    }
+
+    function startInterrogation() {
+      document.title = 'Interrogation';
+      initializeSuspects();
+      sceneBg.src = 'mainimage.jpg';
+      cutsceneBox.classList.add('hidden');
+      nextBtn.classList.add('hidden');
+      statusTag.classList.add('hidden');
+      dialogueBox.style.display = 'flex';
+      timerEl.style.display = 'block';
+      playerInput.focus();
+      updateTimer();
+
+      timerInterval = setInterval(() => {
+        if (gameOver) {
+          clearInterval(timerInterval);
+          return;
+        }
+        interrogationRemaining -= 1;
+        updateTimer();
+        if (interrogationRemaining <= 0) {
+          clearInterval(timerInterval);
+          endInterrogation("⏰ Time's up! You ran out of time to solve the case.");
+        }
+      }, 1000);
+    }
+
+    nextBtn.addEventListener('click', startInterrogation);
+
+    playerInput.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' || gameOver) return;
+
+      const value = playerInput.value.trim();
+      if (!value) return;
+
+      appendHistory('Player', value);
+      const userInput = value.toUpperCase();
+
+      if (['S1', 'S2', 'S3', 'S4', 'S5'].includes(userInput)) {
+        const [correct, message] = checkVerdict(userInput);
+        endInterrogation(message);
+      } else {
+        if (dialogueIndex < dialogue.length) {
+          const [speaker, text] = dialogue[dialogueIndex];
+          appendHistory(speaker, text);
+          dialogueIndex += 1;
+        }
+      }
+
+      playerInput.value = '';
+    });
+
+    loadScene(sceneIndex);
+  </script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Breakout - Menu</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-dark: #060c1f;
+      --bg-mid: #0b1b3a;
+      --bg-light: #142c5a;
+      --panel-dark: #0f172e;
+      --panel-stroke: #05070f;
+      --inner-stroke: #4f6fb3;
+      --screen-frame: #5c6f9e;
+      --screen-inner: #02040a;
+      --screen-shine: rgba(255, 255, 255, 0.05);
+      --accent: #3a7cff;
+      --accent-2: #7aa2ff;
+      --text: #eef3ff;
+      --muted: #9fb4e5;
+      --button-shadow: #0b1326;
+      --button-dark: #0f1f3f;
+      --button-outline: #1a2e5a;
+      --button-muted: #2f4f91;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(90, 120, 255, 0.2), transparent 30%),
+        linear-gradient(180deg, var(--bg-light) 0%, var(--bg-mid) 45%, var(--bg-dark) 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0.04) 0 2px,
+          transparent 2px 120px
+        );
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .menu-shell {
+      width: min(1520px, 98vw);
+      min-height: 710px;
+      padding: 10px 18px 18px;
+      border-radius: 24px;
+      background: rgba(17, 45, 46, 0.75);
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.18);
+      position: relative;
+    }
+
+    .menu-layout {
+      display: grid;
+      grid-template-columns: 490px 1fr;
+      gap: 22px;
+      align-items: stretch;
+      min-height: 610px;
+    }
+      display: grid;
+      grid-template-columns: 490px 1fr;
+      gap: 22px;
+      align-items: stretch;
+      min-height: 610px;
+    }
+
+    .content-panel {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .title {
+      font-size: clamp(3.4rem, 6vw, 4.9rem);
+      line-height: 0.92;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: #f5f3fb;
+      margin: 6px 0 18px 22px;
+      text-transform: uppercase;
+      font-family: "Comic Sans MS", "Trebuchet MS", cursive, sans-serif;
+      text-shadow: 0 3px 0 rgba(0,0,0,0.28);
+    }
+
+    .left-stack {
+      background: linear-gradient(180deg, rgba(20, 24, 26, 0.88), rgba(30, 34, 36, 0.9));
+      border: 4px solid var(--panel-stroke);
+      border-radius: 22px;
+      box-shadow:
+        inset 0 0 0 3px var(--inner-stroke),
+        0 6px 0 rgba(0, 0, 0, 0.22);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .primary-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .action-btn {
+      width: 100%;
+      min-height: 74px;
+      border-radius: 14px;
+      border: 4px solid #192223;
+      background: rgb(254, 222, 79);
+      color: #15343b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px 0 18px;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.18);
+      cursor: pointer;
+      transition: transform 0.12s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .action-btn:active {
+      transform: translateY(2px);
+    }
+
+    .action-btn .icon {
+      font-size: 2rem;
+      line-height: 1;
+      filter: drop-shadow(0 2px 0 rgba(0,0,0,0.2));
+    }
+
+    .action-btn .label {
+      font-size: 1.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-family: "Comic Sans MS", "Trebuchet MS", cursive, sans-serif;
+    }
+
+    .mystery-notes {
+      border-top: 3px solid rgba(160, 179, 182, 0.18);
+      margin-top: 8px;
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      color: #d9ece8;
+    }
+
+    .note-card {
+      min-height: 58px;
+      border-radius: 12px;
+      border: 3px solid #253336;
+      background: linear-gradient(180deg, #1f3f8f 0%, #162c63 100%);
+      padding: 12px 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .note-title {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #a9d6cf;
+      margin-bottom: 4px;
+    }
+
+    .note-text {
+      font-size: 0.95rem;
+      font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
+      color: #f3f8f8;
+    }
+
+    .credits-wrap {
+      margin-top: auto;
+      padding-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .credits-btn {
+      border: 3px solid #3b4045;
+      background: #727277;
+      color: #f0f0f2;
+      border-radius: 8px;
+      padding: 8px 20px;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .footer {
+      width: 100%;
+      text-align: center;
+      color: #d4e6e4;
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    .visual-panel {
+      min-width: 0;
+      border-radius: 30px;
+      padding: 18px;
+      background: linear-gradient(180deg, #2a3f78 0%, #18264d 100%);
+      border: 5px solid #2d3034;
+      box-shadow: inset 0 0 0 3px #b9c1c6;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .visual-panel::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent 25%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .visual-panel img {
+      width: 100%;
+      height: 100%;
+      min-height: 560px;
+      display: block;
+      object-fit: cover;
+      border-radius: 14px;
+      background: #000;
+      filter: brightness(0.62) saturate(0.72) hue-rotate(-8deg);
+    }
+
+    .window-shine {
+      position: absolute;
+      top: 20px;
+      right: 170px;
+      width: 170px;
+      height: calc(100% - 40px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
+      transform: skewX(-28deg);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .window-shine.second {
+      right: 110px;
+      width: 58px;
+      opacity: 0.4;
+    }
+
+    .hazard-overlay {
+      position: absolute;
+      inset: 20px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(64, 255, 182, 0.08), transparent 18%),
+        linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.18));
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .hazard-tag {
+      position: absolute;
+      left: 34px;
+      bottom: 34px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(233, 191, 63, 0.92);
+      color: #1e2125;
+      border: 3px solid #2d3034;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      z-index: 4;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.22);
+    }
+
+    @media (max-width: 1100px) {
+      .menu-layout {
+        grid-template-columns: 420px 1fr;
+      }
+
+      .friends-btn {
+        min-width: 220px;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .menu-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .title {
+        margin-left: 0;
+        text-align: center;
+      }
+
+      .visual-panel img {
+        min-height: 380px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 4px;
+      }
+
+      .menu-shell {
+        width: 100%;
+        padding: 8px;
+        border-radius: 14px;
+      }
+
+      .title {
+        font-size: 2.5rem;
+      }
+
+      .action-btn .label {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="menu-shell">
+    <section class="menu-layout">
+      <div class="content-panel">
+        <div class="title">Lab Breakout</div>
+
+        <div class="left-stack">
+          <div class="primary-actions">
+            <button class="action-btn">
+      
+              <span class="label">Play</span>
+            </button>
+            <button class="action-btn">
+              <span class="label">Instructions</span>
+            </button>
+          </div>
+
+          <div class="mystery-notes">
+            <div class="note-card">
+              <div class="note-title">Case File</div>
+              <div class="note-text">An experiment went wrong. Find out who caused the breach.</div>
+            </div>
+            <div class="note-card">
+              <div class="note-title">Objective</div>
+              <div class="note-text">Search the lab, collect clues, and escape before lockdown.</div>
+            </div>
+          </div>
+
+          <div class="credits-wrap">
+            <button class="credits-btn">Credits</button>
+            <div class="footer">v0.1.0a (prototype build)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual-panel">
+        <img src="/mnt/data/a9f7fdf3-c839-41ba-99fc-872591ddab52.png" alt="Lab Breakout background art" />
+        <div class="hazard-overlay"></div>
+        <div class="window-shine"></div>
+        <div class="window-shine second"></div>
+        <div class="hazard-tag">Quarantine Sector</div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
