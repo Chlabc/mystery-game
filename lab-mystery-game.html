@@ -355,7 +355,7 @@
 
         <div class="left-stack">
           <div class="primary-actions">
-            <button class="action-btn">
+            <button id="playBtn" class="action-btn">
       
               <span class="label">Play</span>
             </button>
@@ -391,5 +391,11 @@
       </div>
     </section>
   </main>
+
+  <script>
+    document.getElementById('playBtn').addEventListener('click', function() {
+      window.location.href = 'cutscene.html';
+    });
+  </script>
 </body>
 </html>
