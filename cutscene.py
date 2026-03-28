@@ -10,6 +10,7 @@ Features:
 
 import pygame
 import sys
+from game_mechanics import initialize_suspects, check_verdict
 
 # --- Initialization ---
 pygame.init()
@@ -160,7 +161,9 @@ def run_cutscene():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     next_button_rect = draw_next_button()
                     if next_button_rect.collidepoint(mouse_pos):
-                        running = False  # End cutscene
+                        # Transition to interrogation scene
+                        run_interrogation()
+                        return  # Exit cutscene after interrogation ends
         
         # --- Update Typewriter Effect ---
         if not text_fully_shown:
@@ -198,6 +201,122 @@ def run_cutscene():
             # Hover effect
             if next_button_rect.collidepoint(mouse_pos):
                 pygame.draw.rect(screen, WHITE, next_button_rect, 3)
+        
+        pygame.display.flip()
+    
+    # Don't quit pygame here - let interrogation continue
+
+
+# --- Interrogation/Dialogue System ---
+# Dialogue data: list of (speaker, text)
+DIALOGUE = [
+    ("Suspect1", "I'm innocent"),
+    ("Suspect2", "That's not the truth"),
+    ("Suspect1", "I swear it"),
+    ("Suspect2", "We'll see about that"),
+]
+
+
+def run_interrogation():
+    """Interrogation scene with command-prompt style dialogue and player input."""
+    global screen, clock
+    
+    pygame.display.set_caption("Interrogation")
+    
+    # Initialize suspects and game
+    initialize_suspects()
+    
+    # Load background
+    background = load_image("mainimage.jpg")
+    
+    dialogue_index = 0
+    player_input = ""
+    dialogue_history = []  # List of (speaker, text) tuples displayed
+    game_over = False
+    verdict_result = None
+    verdict_timer = 0.0
+    
+    running = True
+    
+    while running:
+        delta_time = clock.tick(FPS) / 1000.0
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            
+            if event.type == pygame.KEYDOWN and not game_over:
+                if event.key == pygame.K_RETURN:
+                    # Player hit enter
+                    if player_input.strip():
+                        user_input = player_input.strip().upper()
+                        dialogue_history.append(("Player", player_input))
+                        
+                        # Check if input is a verdict (S1-S5)
+                        if user_input in ["S1", "S2", "S3", "S4", "S5"]:
+                            # Check the verdict
+                            is_correct, message = check_verdict(user_input)
+                            dialogue_history.append(("System", message))
+                            game_over = True
+                            verdict_result = (is_correct, message)
+                            verdict_timer = 0.0
+                        else:
+                            # Regular dialogue
+                            if dialogue_index < len(DIALOGUE):
+                                speaker, text = DIALOGUE[dialogue_index]
+                                dialogue_history.append((speaker, text))
+                                dialogue_index += 1
+                        
+                        player_input = ""
+                
+                elif event.key == pygame.K_BACKSPACE:
+                    player_input = player_input[:-1]
+                
+                else:
+                    # Add character to player input
+                    if len(player_input) < 100:  # Max 100 chars per line
+                        player_input += event.unicode
+        
+        # Track time for verdict display
+        if game_over:
+            verdict_timer += delta_time
+        
+        # --- Rendering ---
+        screen.blit(background, (0, 0))
+        
+        # Draw dialogue box
+        dialogue_box_height = SCREEN_HEIGHT // 2
+        dialogue_box_rect = pygame.Rect(20, SCREEN_HEIGHT - dialogue_box_height - 20, SCREEN_WIDTH - 40, dialogue_box_height - 20)
+        
+        # Draw semi-transparent background
+        dialogue_surf = pygame.Surface((dialogue_box_rect.width, dialogue_box_rect.height))
+        dialogue_surf.set_alpha(TEXTBOX_ALPHA)
+        dialogue_surf.fill(BLACK)
+        screen.blit(dialogue_surf, (dialogue_box_rect.x, dialogue_box_rect.y))
+        pygame.draw.rect(screen, GOLD, dialogue_box_rect, 3)
+        
+        # Render dialogue history
+        font_dialogue = pygame.font.SysFont("courier", 18)
+        line_height = font_dialogue.get_linesize()
+        y_offset = dialogue_box_rect.y + 10
+        
+        # Display past dialogue
+        for speaker, text in dialogue_history:
+            prefix = f"> {speaker}: "
+            dialogue_line = prefix + text
+            text_surf = font_dialogue.render(dialogue_line, True, WHITE)
+            screen.blit(text_surf, (dialogue_box_rect.x + 10, y_offset))
+            y_offset += line_height
+        
+        # Display current player input prompt (only if game not over)
+        if not game_over:
+            player_prompt = "> Player: " + player_input
+            player_prompt_surf = font_dialogue.render(player_prompt, True, WHITE)
+            screen.blit(player_prompt_surf, (dialogue_box_rect.x + 10, y_offset))
+        
+        # If game over, show exit message after 3 seconds
+        if game_over and verdict_timer > 3.0:
+            running = False
         
         pygame.display.flip()
     
