@@ -29,13 +29,21 @@ TEXTBOX_ALPHA = 200 # setting transparency
 # Scene transition settings
 PAUSE_BETWEEN_SCENES = 5000  # milliseconds (5 seconds)
 
+# text displayed in scenes
+
+text1 = "3:03 AM\nAt this hour, the lab is silent — just the low hum of machines and the soft glow of monitors."
+text2 = "3:04 AM ⚠️ BIOHAZARD DETECTED. INITIATING LOCKDOWN.\nSomething inside containment has been released."
+text3 = "Doors slam shut across the facility. In an attempt to contain the threat, the lab's security system has locked down all exits, trapping everyone in the rooms where they are."
+text4 = "Everyone except one.\nIn the chaos, the individual responsible for the breach has managed to slip out of their containment area and into the main lab, where they are now hiding among the other scientists."
+text5 = "As the city's top detective, it's your job to interrogate the suspects and determine who is responsible for the breach before it's too late. The clock is ticking, and the fate of the city hangs in the balance."
+
 # Scene data: (image_file, text_content)
 SCENES = [
-    ("image1.jpg", "Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects. You can support our work with a donation."),
-    ("image2.jpg", "sampletext2"),
-    ("image3.jpg", "sampletext3"),
-    ("image4.jpg", "sampletext4"),
-    ("image5.jpg", "sampletext5"),
+    ("image1.jpg", text1),
+    ("image2.jpg", text2),
+    ("image3.jpg", text3),
+    ("image4.jpg", text4),
+    ("image5.jpg", text5),
 ]
 
 # --- Setup Display ---
@@ -131,8 +139,18 @@ def draw_next_button():
     return button_rect
 
 
-def run_cutscene():
-    """Main cutscene loop."""
+def run_cutscene(shared_screen=None, shared_clock=None):
+    """Main cutscene loop. Can use a shared pygame screen and clock."""
+    global screen, clock
+    
+    use_shared = shared_screen is not None
+    
+    if shared_screen is not None:
+        screen = shared_screen
+    
+    if shared_clock is not None:
+        clock = shared_clock
+    
     scene_index = 0
     text_fully_shown = False
     pause_timer = 0.0  # Accumulates pause time between scenes
@@ -158,7 +176,7 @@ def run_cutscene():
                     next_button_rect = draw_next_button()
                     if next_button_rect.collidepoint(mouse_pos):
                         # Transition to interrogation scene
-                        run_interrogation()
+                        run_interrogation(use_shared)
                         return  # Exit cutscene after interrogation ends
         
         # Text is shown immediately
@@ -202,7 +220,7 @@ DIALOGUE = [
 ]
 
 
-def run_interrogation():
+def run_interrogation(use_shared=False):
     """Interrogation scene with command-prompt style dialogue and player input."""
     global screen, clock
     
@@ -331,8 +349,12 @@ def run_interrogation():
         
         pygame.display.flip()
     
-    pygame.quit()
-    sys.exit()
+    # Only quit pygame if not using a shared screen (standalone mode)
+    if use_shared:
+        return  # Return to calling program
+    else:
+        pygame.quit()
+        sys.exit()
 
 
 if __name__ == "__main__":
