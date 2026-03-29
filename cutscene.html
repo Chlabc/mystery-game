@@ -523,7 +523,7 @@
       const line = document.createElement('div');
       line.textContent = `> ${speaker}: ${text}`;
       historyEl.appendChild(line);
-      historyEl.scrollTop = historyEl.scrollHeight;
+      historyEl.scrollTop = historyEl.scrollHeight + line.offsetHeight;
     }
 
     function updateTimer() {
