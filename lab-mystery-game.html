@@ -1,39 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lab Breakout - Menu</title>
   <style>
+    /* ─── GLOBAL RESET ───────────────────────────────────────────────────────
+       Forces all elements to use border-box sizing so padding and borders
+       don't add extra width/height. Removes browser default margins/padding. */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
+    /* ─── DESIGN TOKENS (CSS CUSTOM PROPERTIES) ──────────────────────────────
+       Central place to store all colours used across the game UI.
+       Changing a value here updates it everywhere it's referenced. */
     :root {
       --bg-dark: #060c1f;
+      /* Darkest background shade (bottom of gradient) */
       --bg-mid: #0b1b3a;
+      /* Mid-tone background (middle of gradient) */
       --bg-light: #142c5a;
+      /* Lightest background shade (top of gradient) */
       --panel-dark: #0f172e;
+      /* Base colour for dark panels */
       --panel-stroke: #05070f;
+      /* Outer border stroke on panels */
       --inner-stroke: #4f6fb3;
+      /* Inner glow/stroke on panels */
       --screen-frame: #5c6f9e;
+      /* Colour used for screen-like frame borders */
       --screen-inner: #02040a;
+      /* Near-black fill inside screen frames */
       --screen-shine: rgba(255, 255, 255, 0.05);
+      /* Subtle white sheen on screens */
       --accent: #3a7cff;
+      /* Primary accent blue */
       --accent-2: #7aa2ff;
+      /* Lighter secondary accent blue */
       --text: #eef3ff;
+      /* Main body text colour */
       --muted: #9fb4e5;
+      /* Dimmed/secondary text colour */
       --button-shadow: #0b1326;
+      /* Drop-shadow colour for buttons */
       --button-dark: #0f1f3f;
+      /* Dark fill used on some buttons */
       --button-outline: #1a2e5a;
+      /* Outline stroke colour for buttons */
       --button-muted: #2f4f91;
+      /* Muted blue used on secondary button states */
     }
 
+    /* ─── PAGE BODY ──────────────────────────────────────────────────────────
+       Fills the full viewport, centres the menu shell both horizontally and
+       vertically, and applies the deep-space gradient background.
+       overflow:hidden prevents scrollbars caused by the decorative grid overlay. */
     body {
       min-height: 100vh;
       font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
+      /* Two-layer background: a radial glow at the top + a linear gradient */
       background:
         radial-gradient(circle at top, rgba(90, 120, 255, 0.2), transparent 30%),
         linear-gradient(180deg, var(--bg-light) 0%, var(--bg-mid) 45%, var(--bg-dark) 100%);
@@ -45,30 +74,42 @@
       overflow: hidden;
     }
 
+    /* ─── DECORATIVE GRID OVERLAY ────────────────────────────────────────────
+       A subtle vertical-line grid drawn via a pseudo-element layered over the
+       entire page. pointer-events:none means it never blocks clicks. */
     body::before {
       content: "";
       position: fixed;
       inset: 0;
+      /* stretches edge-to-edge on all four sides */
       background:
-        repeating-linear-gradient(
-          90deg,
+        repeating-linear-gradient(90deg,
           rgba(0, 0, 0, 0.04) 0 2px,
-          transparent 2px 120px
-        );
+          /* thin dark line every 120 px */
+          transparent 2px 120px);
       opacity: 0.35;
       pointer-events: none;
+      /* let clicks pass through to real elements */
     }
 
+    /* ─── OUTER MENU SHELL ───────────────────────────────────────────────────
+       The outermost container that wraps everything on screen.
+       Capped at 1520 px wide but shrinks on narrower screens via min(). */
     .menu-shell {
       width: min(1520px, 98vw);
       min-height: 710px;
       padding: 10px 18px 18px;
       border-radius: 24px;
       background: rgba(17, 45, 46, 0.75);
+      /* semi-transparent dark teal */
       box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.18);
+      /* subtle inner border */
       position: relative;
     }
 
+    /* ─── 2-COLUMN MENU LAYOUT ───────────────────────────────────────────────
+       Left column (490 px fixed): buttons + story notes.
+       Right column (1fr): the large visual/art panel. */
     .menu-layout {
       display: grid;
       grid-template-columns: 490px 1fr;
@@ -76,21 +117,29 @@
       align-items: stretch;
       min-height: 610px;
     }
-      display: grid;
-      grid-template-columns: 490px 1fr;
-      gap: 22px;
-      align-items: stretch;
-      min-height: 610px;
+
+    display: grid;
+    grid-template-columns: 490px 1fr;
+    gap: 22px;
+    align-items: stretch;
+    min-height: 610px;
     }
 
+    /* ─── RIGHT CONTENT COLUMN ───────────────────────────────────────────────
+       Flex column so child elements (title, left-stack) stack vertically. */
     .content-panel {
       display: flex;
       flex-direction: column;
       min-width: 0;
+      /* prevents grid blowout when text is long */
     }
 
+    /* ─── GAME TITLE TEXT ────────────────────────────────────────────────────
+       Uses clamp() so the font scales smoothly between viewport sizes.
+       Comic Sans gives it a hand-drawn, retro-game personality. */
     .title {
       font-size: clamp(3.4rem, 6vw, 4.9rem);
+      /* responsive: min 3.4rem, max 4.9rem */
       line-height: 0.92;
       font-weight: 500;
       letter-spacing: 0.04em;
@@ -98,24 +147,33 @@
       margin: 6px 0 18px 22px;
       text-transform: uppercase;
       font-family: "Comic Sans MS", "Trebuchet MS", cursive, sans-serif;
-      text-shadow: 0 3px 0 rgba(0,0,0,0.28);
+      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.28);
+      /* slight drop-shadow for depth */
     }
 
+    /* ─── LEFT PANEL (dark card containing buttons & notes) ─────────────────
+       Styled like a physical game-controller face: dark background, thick
+       border, and an inner highlight stroke. */
     .left-stack {
       background: linear-gradient(180deg, rgba(20, 24, 26, 0.88), rgba(30, 34, 36, 0.9));
       border: 4px solid var(--panel-stroke);
       border-radius: 22px;
       box-shadow:
         inset 0 0 0 3px var(--inner-stroke),
+        /* inner blue glow ring */
         0 6px 0 rgba(0, 0, 0, 0.22);
+      /* bottom shadow for 3-D lift */
       padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 12px;
       position: relative;
       overflow: hidden;
+      /* clips any decorative children that extend outside */
     }
 
+    /* ─── ACTION BUTTONS WRAPPER ─────────────────────────────────────────────
+       Groups the Play and Instructions buttons in a vertical stack. */
     .primary-actions {
       display: flex;
       flex-direction: column;
@@ -123,38 +181,49 @@
       margin-bottom: 6px;
     }
 
+    /* ─── INDIVIDUAL ACTION BUTTON (Play / Instructions) ────────────────────
+       Yellow arcade-style buttons with a slight 3-D press effect on hover/click. */
     .action-btn {
       width: 100%;
       min-height: 74px;
       border-radius: 14px;
       border: 4px solid #192223;
       background: rgb(254, 222, 79);
+      /* bright yellow */
       color: #15343b;
+      /* dark teal text for contrast */
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 22px 0 18px;
-      box-shadow: inset 0 2px 0 rgba(255,255,255,0.18);
+      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.18);
+      /* top-edge highlight */
       cursor: pointer;
       transition: transform 0.12s ease;
+      /* smooth movement on hover/press */
       position: relative;
       overflow: hidden;
     }
 
+    /* Lifts the button slightly when hovered */
     .action-btn:hover {
       transform: translateY(-1px);
     }
 
+    /* Pushes the button down to simulate being pressed */
     .action-btn:active {
       transform: translateY(2px);
     }
 
+    /* Icon inside the button (emoji or image) */
     .action-btn .icon {
       font-size: 2rem;
       line-height: 1;
-      filter: drop-shadow(0 2px 0 rgba(0,0,0,0.2));
+      filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.2));
+      /* subtle icon shadow */
     }
 
+    /* Button label text (e.g. "PLAY", "INSTRUCTIONS") */
     .action-btn .label {
       font-size: 1.35rem;
       text-transform: uppercase;
@@ -162,8 +231,12 @@
       font-family: "Comic Sans MS", "Trebuchet MS", cursive, sans-serif;
     }
 
+    /* ─── MYSTERY/STORY NOTES SECTION ────────────────────────────────────────
+       Sits below the buttons. Separated from them by a faint top border.
+       Displays the case file description and the player's objective. */
     .mystery-notes {
       border-top: 3px solid rgba(160, 179, 182, 0.18);
+      /* subtle divider line */
       margin-top: 8px;
       padding-top: 16px;
       display: flex;
@@ -172,31 +245,42 @@
       color: #d9ece8;
     }
 
+    /* ─── INDIVIDUAL NOTE CARD ───────────────────────────────────────────────
+       Blue-tinted card used for "Case File" and "Objective" blurbs. */
     .note-card {
       min-height: 58px;
       border-radius: 12px;
       border: 3px solid #253336;
       background: linear-gradient(180deg, #1f3f8f 0%, #162c63 100%);
+      /* deep blue gradient */
       padding: 12px 16px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      /* top highlight */
     }
 
+    /* Small uppercase label at the top of each note card (e.g. "CASE FILE") */
     .note-title {
       font-size: 0.76rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
       color: #a9d6cf;
+      /* minty teal for readability on dark blue */
       margin-bottom: 4px;
     }
 
+    /* Main body text inside the note card */
     .note-text {
       font-size: 0.95rem;
       font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
       color: #f3f8f8;
     }
 
+    /* ─── CREDITS / FOOTER AREA ──────────────────────────────────────────────
+       Pinned to the bottom of the left panel using margin-top: auto.
+       Contains the Credits button and the version string. */
     .credits-wrap {
       margin-top: auto;
+      /* pushes this element to the very bottom of the flex container */
       padding-top: 6px;
       display: flex;
       align-items: center;
@@ -205,6 +289,7 @@
       flex-wrap: wrap;
     }
 
+    /* Grey secondary button for the Credits action */
     .credits-btn {
       border: 3px solid #3b4045;
       background: #727277;
@@ -215,6 +300,7 @@
       font-size: 0.85rem;
     }
 
+    /* Small version label shown next to the Credits button */
     .footer {
       width: 100%;
       text-align: center;
@@ -224,6 +310,9 @@
       margin-top: 2px;
     }
 
+    /* ─── RIGHT-SIDE VISUAL PANEL (art / scene image) ────────────────────────
+       Acts like a CRT monitor or window into the lab.
+       The layered box-shadow and inner border create a thick "frame" effect. */
     .visual-panel {
       min-width: 0;
       border-radius: 30px;
@@ -231,60 +320,82 @@
       background: linear-gradient(180deg, #2a3f78 0%, #18264d 100%);
       border: 5px solid #2d3034;
       box-shadow: inset 0 0 0 3px #b9c1c6;
+      /* inner silver ring */
       position: relative;
       overflow: hidden;
+      /* clips shine/overlay decorations to rounded corners */
     }
 
+    /* Top highlight shine drawn over the visual panel (glass-screen effect) */
     .visual-panel::before {
       content: "";
       position: absolute;
       inset: 14px;
       border-radius: 20px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent 25%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 25%);
       pointer-events: none;
       z-index: 2;
+      /* sits above the image but below the hazard overlay */
     }
 
+    /* The actual background/scene image inside the visual panel */
     .visual-panel img {
       width: 100%;
       height: 100%;
       min-height: 560px;
       display: block;
       object-fit: cover;
+      /* fills the area without distorting the image */
       border-radius: 14px;
       background: #000;
+      /* fallback colour while image loads */
+      /* Darkens and desaturates the image to match the moody UI palette */
       filter: brightness(0.62) saturate(0.72) hue-rotate(-8deg);
     }
 
+    /* ─── WINDOW SHINE STRIPS ────────────────────────────────────────────────
+       Two skewed rectangles that mimic reflection streaks on glass/screen.
+       They are purely decorative and pass all pointer events through. */
     .window-shine {
       position: absolute;
       top: 20px;
       right: 170px;
       width: 170px;
       height: calc(100% - 40px);
-      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
       transform: skewX(-28deg);
+      /* angled glare effect */
       pointer-events: none;
       z-index: 3;
     }
 
+    /* Second, thinner shine strip positioned slightly left of the first */
     .window-shine.second {
       right: 110px;
       width: 58px;
       opacity: 0.4;
+      /* dimmer than the primary shine */
     }
 
+    /* ─── HAZARD OVERLAY ─────────────────────────────────────────────────────
+       A transparent tinted layer placed over the art image.
+       Adds a biohazard/contamination atmosphere with a subtle green glow. */
     .hazard-overlay {
       position: absolute;
       inset: 20px;
       border-radius: 14px;
       background:
         radial-gradient(circle at 20% 18%, rgba(64, 255, 182, 0.08), transparent 18%),
-        linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.18));
+        /* green glow spot */
+        linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.18));
+      /* slight vignette */
       pointer-events: none;
       z-index: 2;
     }
 
+    /* ─── HAZARD TAG (bottom-left label on the image) ────────────────────────
+       A small amber warning label that reads "Quarantine Sector".
+       Positioned over the image using absolute positioning. */
     .hazard-tag {
       position: absolute;
       left: 34px;
@@ -292,15 +403,23 @@
       padding: 10px 14px;
       border-radius: 10px;
       background: rgba(233, 191, 63, 0.92);
+      /* amber / caution-tape yellow */
       color: #1e2125;
       border: 3px solid #2d3034;
       font-size: 0.86rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       z-index: 4;
-      box-shadow: 0 4px 0 rgba(0,0,0,0.22);
+      /* on top of shines and overlays */
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.22);
+      /* bottom shadow for 3-D lift */
     }
 
+    /* ─── RESPONSIVE BREAKPOINTS ─────────────────────────────────────────────
+       The layout shifts at three breakpoints so the menu stays usable on
+       tablets, phones, and any screen smaller than the full desktop layout. */
+
+    /* ── Medium screens (≤ 1100 px): shrink the left column slightly */
     @media (max-width: 1100px) {
       .menu-layout {
         grid-template-columns: 420px 1fr;
@@ -311,34 +430,42 @@
       }
     }
 
+    /* ── Small screens (≤ 920 px): switch to a single-column stacked layout */
     @media (max-width: 920px) {
       .menu-layout {
         grid-template-columns: 1fr;
+        /* left and right panels stack on top of each other */
       }
 
+      /* Centre the title when there's no left column to indent from */
       .title {
         margin-left: 0;
         text-align: center;
       }
 
+      /* Reduce the minimum image height so it doesn't dominate a portrait screen */
       .visual-panel img {
         min-height: 380px;
       }
     }
 
+    /* ── Extra-small screens (≤ 640 px): tighten padding and shrink text */
     @media (max-width: 640px) {
       body {
         padding: 4px;
+        /* less breathing room on very small screens */
       }
 
       .menu-shell {
         width: 100%;
         padding: 8px;
         border-radius: 14px;
+        /* slightly less rounding on small screens */
       }
 
       .title {
         font-size: 2.5rem;
+        /* smaller than clamp min so it fits on phones */
       }
 
       .action-btn .label {
@@ -347,55 +474,94 @@
     }
   </style>
 </head>
+
 <body>
+  <!-- ── OUTER SHELL ──────────────────────────────────────────────────────────
+       <main> acts as the page landmark. .menu-shell is the big rounded card
+       that contains everything visible on screen. -->
   <main class="menu-shell">
+
+    <!-- ── 2-COLUMN LAYOUT (left panel + right visual panel) ────────────────── -->
     <section class="menu-layout">
+
+      <!-- ── LEFT COLUMN: title, action buttons, story notes, footer ─────────── -->
       <div class="content-panel">
+
+        <!-- Game title displayed at the top of the left column -->
         <div class="title">Lab Breakout</div>
 
+        <!-- Dark rounded card that holds all left-side interactive elements -->
         <div class="left-stack">
+
+          <!-- Primary navigation buttons (Play and Instructions) -->
           <div class="primary-actions">
+
+            <!-- Play button — clicking this starts the game (see JS below) -->
             <button id="playBtn" class="action-btn">
-      
               <span class="label">Play</span>
             </button>
+
+            <!-- Instructions button — opens gameplay instructions (no action wired yet) -->
             <button class="action-btn">
               <span class="label">Instructions</span>
             </button>
-          </div>
 
+          </div><!-- /primary-actions -->
+
+          <!-- Story context cards: brief lore blurbs shown below the buttons -->
           <div class="mystery-notes">
+
+            <!-- Case File card: one-sentence summary of the scenario -->
             <div class="note-card">
               <div class="note-title">Case File</div>
               <div class="note-text">An experiment went wrong. Find out who caused the breach.</div>
             </div>
+
+            <!-- Objective card: tells the player what they need to do -->
             <div class="note-card">
               <div class="note-title">Objective</div>
               <div class="note-text">Search the lab, collect clues, and escape before lockdown.</div>
             </div>
-          </div>
 
+          </div><!-- /mystery-notes -->
+
+          <!-- Footer area: Credits button + version string, pinned to bottom of card -->
           <div class="credits-wrap">
             <button class="credits-btn">Credits</button>
             <div class="footer">v0.1.0a (prototype build)</div>
           </div>
-        </div>
-      </div>
 
+        </div><!-- /left-stack -->
+      </div><!-- /content-panel -->
+
+      <!-- ── RIGHT COLUMN: large background art / visual panel ─────────────── -->
       <div class="visual-panel">
+
+        <!-- Lab background artwork; filtered darker to match the moody palette -->
         <img src="/mnt/data/a9f7fdf3-c839-41ba-99fc-872591ddab52.png" alt="Lab Breakout background art" />
+
+        <!-- Semi-transparent tinted overlay — adds atmospheric depth over the image -->
         <div class="hazard-overlay"></div>
+
+        <!-- Decorative glare/shine strips simulating a glass screen surface -->
         <div class="window-shine"></div>
         <div class="window-shine second"></div>
+
+        <!-- Amber warning label anchored to the bottom-left of the image -->
         <div class="hazard-tag">Quarantine Sector</div>
-      </div>
-    </section>
-  </main>
+
+      </div><!-- /visual-panel -->
+    </section><!-- /menu-layout -->
+  </main><!-- /menu-shell -->
 
   <script>
-    document.getElementById('playBtn').addEventListener('click', function() {
+    // ── PLAY BUTTON: navigate to the cutscene when clicked ────────────────────
+    // Grabs the button by its unique ID and attaches a click listener.
+    // When the player clicks "Play", the browser loads cutscene.html.
+    document.getElementById('playBtn').addEventListener('click', function () {
       window.location.href = 'cutscene.html';
     });
   </script>
 </body>
+
 </html>
