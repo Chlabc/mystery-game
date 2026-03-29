@@ -16,18 +16,14 @@ load_dotenv()
 # ── AI model to use across all Groq calls ──────────────────────────────────
 GROQ_MODEL = "llama-3.3-70b-versatile"
 
-# Bio lab job titles
-BIO_LAB_JOBS = [
-    "Microbiologist",
-    "Lab Technician",
-    "Biochemist",
-    "Research Assistant",
-    "Quality Control Analyst",
-    "Sample Analyst",
-    "Molecular Biologist",
-    "Senior Lab Technician",
-    "Bioinformatician",
-    "Sterile Area Technician",
+# Fixed suspect roster — names and roles match the cutscene intro cards.
+# Each entry: (name, job_title, personality_note)
+_SUSPECT_ROSTER = [
+    ("Dr. Evelyn Kallen",  "Microbiologist",          "under immense funding pressure, argumentative with management"),
+    ("Dr. Marcus Reed",    "Bioinformatician",         "secretive by nature, was spotted near the containment area"),
+    ("Dr. Lucia Chen",     "Senior Lab Technician",    "dedicated but lately erratic and visibly stressed"),
+    ("Dr. Samuel Ortiz",   "Quality Control Analyst",  "under investigation for falsified data, history of colleague conflicts"),
+    ("Dr. Penelope Grant", "Sterile Area Technician",  "meticulous worker but distracted by unresolved personal issues"),
 ]
 
 # Initialize Groq AI client for alibi generation
@@ -71,27 +67,25 @@ Generate only the alibi text, nothing else."""
 SUSPECTS = {}
 
 def initialize_suspects():
-    """Initialize 5 suspects with random job titles, AI-generated alibis, and guilt status."""
-    # Randomly select one guilty suspect
+    """Initialize the 5 named suspects with AI-generated alibis and randomised guilt."""
+    # Pick one suspect at random to be the culprit each game
     guilty_index = random.randint(1, 5)
-    
-    job_titles = random.sample(BIO_LAB_JOBS, 5)
-    
+
     # Initialize AI client for alibi generation
     ai_client = get_ai_client()
-    
-    # Generate alibis using AI
+
+    # Generate one alibi per suspect using AI
     alibis = [generate_alibi_with_ai(ai_client) for _ in range(5)]
-    
-    for i in range(1, 6):
+
+    for i, (name, job_title, _personality) in enumerate(_SUSPECT_ROSTER, start=1):
         suspect_id = f"S{i}"
         SUSPECTS[suspect_id] = {
-            "name": f"Suspect {i}",
-            "job_title": job_titles[i - 1],
+            "name": name,
+            "job_title": job_title,
             "alibi": alibis[i - 1],
             "guilty": (i == guilty_index),
         }
-    
+
     return guilty_index
 
 
@@ -124,34 +118,40 @@ def get_all_suspects_info():
 
 
 # ── System prompt template for suspect interrogation ───────────────────────
-# {name}, {job_title}, {alibi}, and {guilt_instructions} are filled in per suspect.
+# {name}, {job_title}, {personality}, {alibi}, and {guilt_instructions} are filled in
+# per suspect so each character feels distinct.
 SUSPECT_SYSTEM_PROMPT = """You are a character in a mystery-detective game.
 You are being interrogated by a detective about a biohazard breach at the biolab where you work.
 
 Your character:
 - Name: {name}
 - Job: {job_title}
+- Known for: {personality}
 - Your alibi: "{alibi}"
 {guilt_instructions}
 
 RULES:
 - Stay in character at ALL times. Respond as this specific lab worker.
 - Keep responses to 2-4 sentences. Be conversational and human.
+- Let your known personality traits colour how you speak and react.
 - You are stressed and defensive — being interrogated is uncomfortable, even if you're innocent.
 - Refer to your alibi naturally; don't just robotically quote it.
 - Do NOT break character or acknowledge that this is a game.
 - Do NOT use any status tags or brackets in your response.
 """
 
+# Guilt instructions shape subtly different behaviour based on innocence/guilt.
 GUILTY_INSTRUCTIONS = """- You are GUILTY. You caused the breach and are hiding it.
 - Defend yourself, but show subtle signs of nervousness when pressed on details.
 - Your alibi has small inconsistencies — if the detective probes carefully you may slip up.
-- Never directly confess, but don't lie perfectly either. Hesitate, deflect, change the subject."""
+- Never directly confess, but don't lie perfectly either. Hesitate, deflect, change the subject.
+- Let your personal backstory leak through under pressure."""
 
 INNOCENT_INSTRUCTIONS = """- You are INNOCENT. You had nothing to do with the breach.
 - Be cooperative but anxious — you want to clear your name.
 - Your alibi is solid and consistent. You can recall details clearly.
-- Show frustration or hurt feelings if accused too aggressively."""
+- Show frustration or hurt feelings if accused too aggressively.
+- Your personality and backstory make you a believable but innocent suspect."""
 
 
 class SuspectInterrogation:
@@ -181,10 +181,15 @@ class SuspectInterrogation:
         # Pick the right guilt instructions
         guilt_block = GUILTY_INSTRUCTIONS if suspect["guilty"] else INNOCENT_INSTRUCTIONS
 
-        # Build the system prompt for this specific suspect
+        # Build the system prompt for this specific suspect.
+        # _SUSPECT_ROSTER index is (suspect_id number - 1), e.g. S1 → index 0.
+        roster_index = int(suspect_id[1]) - 1
+        _name, _job, personality = _SUSPECT_ROSTER[roster_index]
+
         system_prompt = SUSPECT_SYSTEM_PROMPT.format(
             name=suspect["name"],
             job_title=suspect["job_title"],
+            personality=personality,
             alibi=suspect["alibi"],
             guilt_instructions=guilt_block,
         )

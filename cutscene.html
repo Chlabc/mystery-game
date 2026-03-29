@@ -434,23 +434,39 @@
     ];
 
     const dialogue = [
-      ['Suspect1', "I'm innocent"],
-      ['Suspect2', "That's not the truth"],
-      ['Suspect1', 'I swear it'],
-      ['Suspect2', "We'll see about that"]
+      ['Dr. Lucia Chen',    "I was maintaining the containment systems all evening — you can check the logs."],
+      ['Dr. Marcus Reed',   "That's not the whole story. I was near the unit, yes, but only running diagnostics."],
+      ['Dr. Evelyn Kallen', "I had nothing to do with this. My research is completely above board."],
+      ['Dr. Samuel Ortiz',  "I know how this looks, but I haven't falsified anything. Someone's setting me up."],
+      ['Dr. Penelope Grant',"I signed off on that maintenance check myself. Everything was sealed properly."]
     ];
+
+    // Suspect roster: maps S1-S5 to real names and job titles (mirrors game_mechanics.py)
+    const SUSPECT_ROSTER = {
+      S1: { name: 'Dr. Evelyn Kallen',  job: 'Microbiologist' },
+      S2: { name: 'Dr. Marcus Reed',    job: 'Bioinformatician' },
+      S3: { name: 'Dr. Lucia Chen',     job: 'Senior Lab Technician' },
+      S4: { name: 'Dr. Samuel Ortiz',   job: 'Quality Control Analyst' },
+      S5: { name: 'Dr. Penelope Grant', job: 'Sterile Area Technician' },
+    };
+
+    // Returns the display label for a suspect ID, e.g. "Dr. Evelyn Kallen (S1)"
+    function suspectLabel(id) {
+      const s = SUSPECT_ROSTER[id];
+      return s ? `${s.name} (${id})` : id;
+    }
 
     // Placeholder browser versions of the Python functions.
     function initializeSuspects() {
-      return ['S1', 'S2', 'S3', 'S4', 'S5'];
+      return Object.keys(SUSPECT_ROSTER); // ['S1','S2','S3','S4','S5']
     }
 
     function checkVerdict(code) {
-      const correct = 'S3';
+      const correct = 'S3'; // Dr. Lucia Chen is the culprit in the demo build
       if (code === correct) {
-        return [true, 'Correct. You identified the scientist responsible for the breach.'];
+        return [true, `Correct. ${suspectLabel(code)} was responsible for the breach.`];
       }
-      return [false, `Incorrect. ${code} is not the culprit.`];
+      return [false, `Incorrect. ${suspectLabel(code)} is not the culprit. Keep investigating.`];
     }
 
     const sceneBg = document.getElementById('sceneBg');
