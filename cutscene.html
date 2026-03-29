@@ -374,6 +374,7 @@
     </div>
 
     <button id="nextBtn" class="next-btn">Next</button>
+    <button id="skipBtn" class="next-btn" style="left: 280px;">Skip to Interrogation</button>
 
     <div id="timer" class="timer">05:00</div>
 
@@ -434,19 +435,19 @@
     ];
 
     const dialogue = [
-      ['Dr. Lucia Chen',    "I was maintaining the containment systems all evening — you can check the logs."],
-      ['Dr. Marcus Reed',   "That's not the whole story. I was near the unit, yes, but only running diagnostics."],
+      ['Dr. Lucia Chen', "I was maintaining the containment systems all evening — you can check the logs."],
+      ['Dr. Marcus Reed', "That's not the whole story. I was near the unit, yes, but only running diagnostics."],
       ['Dr. Evelyn Kallen', "I had nothing to do with this. My research is completely above board."],
-      ['Dr. Samuel Ortiz',  "I know how this looks, but I haven't falsified anything. Someone's setting me up."],
-      ['Dr. Penelope Grant',"I signed off on that maintenance check myself. Everything was sealed properly."]
+      ['Dr. Samuel Ortiz', "I know how this looks, but I haven't falsified anything. Someone's setting me up."],
+      ['Dr. Penelope Grant', "I signed off on that maintenance check myself. Everything was sealed properly."]
     ];
 
     // Suspect roster: maps S1-S5 to real names and job titles (mirrors game_mechanics.py)
     const SUSPECT_ROSTER = {
-      S1: { name: 'Dr. Evelyn Kallen',  job: 'Microbiologist' },
-      S2: { name: 'Dr. Marcus Reed',    job: 'Bioinformatician' },
-      S3: { name: 'Dr. Lucia Chen',     job: 'Senior Lab Technician' },
-      S4: { name: 'Dr. Samuel Ortiz',   job: 'Quality Control Analyst' },
+      S1: { name: 'Dr. Evelyn Kallen', job: 'Microbiologist' },
+      S2: { name: 'Dr. Marcus Reed', job: 'Bioinformatician' },
+      S3: { name: 'Dr. Lucia Chen', job: 'Senior Lab Technician' },
+      S4: { name: 'Dr. Samuel Ortiz', job: 'Quality Control Analyst' },
       S5: { name: 'Dr. Penelope Grant', job: 'Sterile Area Technician' },
     };
 
@@ -473,6 +474,7 @@
     const sceneText = document.getElementById('sceneText');
     const cutsceneBox = document.getElementById('cutsceneBox');
     const nextBtn = document.getElementById('nextBtn');
+    const skipBtn = document.getElementById('skipBtn');
     const dialogueBox = document.getElementById('dialogueBox');
     const historyEl = document.getElementById('history');
     const playerInput = document.getElementById('playerInput');
@@ -503,17 +505,17 @@
       sceneBg.src = imageKey ? scene[imageKey] : '';
       sceneText.textContent = scene.text;
       renderProgress(index);
-      nextBtn.style.display = 'none';
 
       if (sceneTimeout) clearTimeout(sceneTimeout);
 
-      if (index < scenes.length - 1) {
-        sceneTimeout = setTimeout(() => {
-          sceneIndex += 1;
-          loadScene(sceneIndex);
-        }, PAUSE_BETWEEN_SCENES);
+      // Always show the buttons for manual control
+      nextBtn.style.display = 'block';
+      skipBtn.style.display = 'block';
+      if (index === scenes.length - 1) {
+        nextBtn.textContent = 'Start Interrogation';
+        skipBtn.style.display = 'none'; // No need to skip on last scene
       } else {
-        nextBtn.style.display = 'block';
+        nextBtn.textContent = 'Next';
       }
     }
 
@@ -553,6 +555,7 @@
       sceneBg.src = 'mainimage.jpg';
       cutsceneBox.classList.add('hidden');
       nextBtn.classList.add('hidden');
+      skipBtn.classList.add('hidden');
       statusTag.classList.add('hidden');
       dialogueBox.style.display = 'flex';
       timerEl.style.display = 'block';
@@ -573,7 +576,16 @@
       }, 1000);
     }
 
-    nextBtn.addEventListener('click', startInterrogation);
+    nextBtn.addEventListener('click', () => {
+      if (sceneIndex < scenes.length - 1) {
+        sceneIndex += 1;
+        loadScene(sceneIndex);
+      } else {
+        startInterrogation();
+      }
+    });
+
+    skipBtn.addEventListener('click', startInterrogation);
 
     playerInput.addEventListener('keydown', (event) => {
       if (event.key !== 'Enter' || gameOver) return;

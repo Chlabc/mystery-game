@@ -472,6 +472,69 @@
         font-size: 1.1rem;
       }
     }
+
+    /* ─── INSTRUCTIONS OVERLAY ─────────────────────────────────────────────── */
+    .instructions-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .instructions-overlay.hidden {
+      display: none;
+    }
+
+    .instructions-content {
+      background: var(--bg-mid);
+      border: 4px solid var(--panel-stroke);
+      border-radius: 24px;
+      padding: 30px;
+      max-width: 600px;
+      width: 90%;
+      color: var(--text);
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .instructions-content h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: var(--accent);
+    }
+
+    .instructions-text {
+      text-align: left;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .instructions-text ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    .back-btn {
+      background: var(--accent);
+      color: var(--bg-dark);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .back-btn:hover {
+      background: var(--accent-2);
+    }
   </style>
 </head>
 
@@ -502,7 +565,7 @@
             </button>
 
             <!-- Instructions button — opens gameplay instructions (no action wired yet) -->
-            <button class="action-btn">
+            <button id="instructionsBtn" class="action-btn">
               <span class="label">Instructions</span>
             </button>
 
@@ -538,7 +601,7 @@
       <div class="visual-panel">
 
         <!-- Lab background artwork; filtered darker to match the moody palette -->
-        <img src="/mnt/data/a9f7fdf3-c839-41ba-99fc-872591ddab52.png" alt="Lab Breakout background art" />
+        <img src="mainimage.jpg" alt="Lab Breakout background art" />
 
         <!-- Semi-transparent tinted overlay — adds atmospheric depth over the image -->
         <div class="hazard-overlay"></div>
@@ -554,12 +617,50 @@
     </section><!-- /menu-layout -->
   </main><!-- /menu-shell -->
 
+  <!-- Instructions overlay -->
+  <div id="instructionsOverlay" class="instructions-overlay hidden">
+    <div class="instructions-content">
+      <h1>How to Play Lab Breakout</h1>
+      <div class="instructions-text">
+        <p><strong>Objective:</strong> Investigate the lab breach, collect clues, interrogate suspects, and escape
+          before time runs out.</p>
+        <p><strong>Controls:</strong></p>
+        <ul>
+          <li>Click "Play" to start the cutscene and begin the game.</li>
+          <li>During the cutscene, use "Next" to advance or "Skip to Interrogation" to jump ahead.</li>
+          <li>In the interrogation phase, type commands or suspect IDs (S1-S5) to question people.</li>
+          <li>You have 5 minutes to solve the case!</li>
+        </ul>
+        <p><strong>Suspects:</strong></p>
+        <ul>
+          <li>S1: Dr. Evelyn Kallen (Microbiologist)</li>
+          <li>S2: Dr. Marcus Reed (Bioinformatician)</li>
+          <li>S3: Dr. Lucia Chen (Senior Lab Technician)</li>
+          <li>S4: Dr. Samuel Ortiz (Quality Control Analyst)</li>
+          <li>S5: Dr. Penelope Grant (Sterile Area Technician)</li>
+        </ul>
+        <p>Good luck, detective!</p>
+      </div>
+      <button id="backBtn" class="back-btn">Back to Menu</button>
+    </div>
+  </div>
+
   <script>
     // ── PLAY BUTTON: navigate to the cutscene when clicked ────────────────────
     // Grabs the button by its unique ID and attaches a click listener.
     // When the player clicks "Play", the browser loads cutscene.html.
     document.getElementById('playBtn').addEventListener('click', function () {
       window.location.href = 'cutscene.html';
+    });
+
+    // ── INSTRUCTIONS BUTTON: show instructions overlay ───────────────────────
+    document.getElementById('instructionsBtn').addEventListener('click', function () {
+      document.getElementById('instructionsOverlay').classList.remove('hidden');
+    });
+
+    // ── BACK BUTTON: hide instructions and return to menu ────────────────────
+    document.getElementById('backBtn').addEventListener('click', function () {
+      document.getElementById('instructionsOverlay').classList.add('hidden');
     });
   </script>
 </body>
