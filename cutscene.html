@@ -501,6 +501,7 @@
   </div>
 
   <script>
+    const INTEGRATED_GAME_URL = './lab_breakout_integrated%20(7).html?from=cutscene';
     const PAUSE_BETWEEN_SCENES = 5000;
     const INTERROGATION_TIME = 300;
 
@@ -714,30 +715,8 @@
     }
 
     function startInterrogation() {
-      document.title = 'Interrogation';
-      initializeSuspects();
-      sceneBg.src = 'mainimage.jpg';
-      cutsceneBox.classList.add('hidden');
-      nextBtn.classList.add('hidden');
-      skipBtn.classList.add('hidden');
-      statusTag.classList.add('hidden');
-      dialogueBox.style.display = 'flex';
-      timerEl.style.display = 'block';
-      playerInput.focus();
-      updateTimer();
-
-      timerInterval = setInterval(() => {
-        if (gameOver) {
-          clearInterval(timerInterval);
-          return;
-        }
-        interrogationRemaining -= 1;
-        updateTimer();
-        if (interrogationRemaining <= 0) {
-          clearInterval(timerInterval);
-          endInterrogation("⏰ Time's up! You ran out of time to solve the case.", false);
-        }
-      }, 1000);
+      sessionStorage.setItem('labBreakoutIntroSeen', 'true');
+      window.location.href = INTEGRATED_GAME_URL;
     }
 
     nextBtn.addEventListener('click', () => {

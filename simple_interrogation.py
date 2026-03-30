@@ -58,6 +58,7 @@ ALIBI_PROMPT_TEMPLATE = """You are creating one alibi for a mystery game suspect
 The suspect works as a {job} in a biolab and was one of the staff members working overtime when a biohazard breach happened at around 3 AM.
 Generate ONE SHORT, REALISTIC alibi in 1 sentence.
 Make the alibi fit their job and the lab setting.
+The storage room is only used for storing different biological samples, so do not place the suspect there.
 Do not invent named coworkers, witnesses, security staff, or other off-screen characters.
 Generate only the alibi text, nothing else."""
 
@@ -70,7 +71,7 @@ Your character:
 - Personality: {personality}
 - You were one of the staff members working overtime when the breach happened around 3 AM.
 - Your alibi: "{alibi}"
-- Hidden case fact: the disease was taken from the storage room.
+- Hidden case fact: the disease was taken from the storage room, which is only used for storing different biological samples.
 - Hidden truth: {guilt_prompt}
 
 RULES:
@@ -85,7 +86,7 @@ RULES:
 """
 
 GUILTY_PROMPT = (
-    "You are guilty, and you were actually in the storage room even though your alibi says otherwise, so keep defending yourself but let a few small inconsistencies, hedges, or changes in detail slip out when you are under pressure."
+    "You are guilty, and you were actually in the storage room even though your alibi says otherwise, but never openly admit being in the storage room; instead keep defending yourself and let small inconsistencies, hedges, or shifts in timing and detail slip out under pressure."
 )
 
 INNOCENT_PROMPT = (
