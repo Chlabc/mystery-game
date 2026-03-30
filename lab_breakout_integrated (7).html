@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Breakout - Integrated</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-dark: #0f0f1e;
+      --bg-mid: #1a1a2e;
+      --bg-light: #16213e;
+      --panel-bg: rgba(15, 52, 96, 0.3);
+      --panel-border: #00d4ff;
+      --panel-outer: #0f0f1e;
+      --text: #f0f4f8;
+      --muted: #a0aec0;
+      --accent: #00d4ff;
+      --accent-dark: #7c3aed;
+      --button-blue: #00d4ff;
+      --button-blue-dark: #7c3aed;
+      --danger: #ff7b72;
+      --success: #82ffb2;
+      --warning: #ffd166;
+      --user: #76b7ff;
+      --suspect: #ffcf7d;
+      --system: #aeb9c7;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.15), transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.1), transparent 50%),
+        linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(90deg,
+          rgba(0, 212, 255, 0.02) 0 2px,
+          transparent 2px 148px);
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    .menu-shell,
+    .game-shell {
+      width: min(1520px, 98vw);
+      min-height: 710px;
+      padding: 10px 18px 18px;
+      border-radius: 24px;
+      background: rgba(17, 45, 46, 0.75);
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.18);
+      position: relative;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .menu-layout {
+      display: grid;
+      grid-template-columns: 490px 1fr;
+      gap: 22px;
+      align-items: stretch;
+      min-height: 610px;
+    }
+
+    .content-panel {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .title,
+    .game-title {
+      font-size: clamp(3.2rem, 5.6vw, 4.9rem);
+      line-height: 0.92;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin: 6px 0 18px 22px;
+      text-transform: uppercase;
+      font-family: 'IBM Plex Mono', monospace;
+      text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+      animation: pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      from {
+        filter: brightness(1);
+      }
+
+      to {
+        filter: brightness(1.1);
+      }
+    }
+
+    .left-stack,
+    .game-panel,
+    .game-sidebar {
+      background: var(--panel-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--panel-border);
+      border-radius: 22px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(0, 212, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-stack {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .primary-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .action-btn,
+    .small-btn,
+    .send-btn,
+    .menu-btn,
+    .credits-btn,
+    .back-btn {
+      border-radius: 14px;
+      border: 2px solid rgba(0, 212, 255, 0.3);
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+    }
+
+    .action-btn {
+      width: 100%;
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 18px;
+      font-size: 1.2rem;
+    }
+
+    .action-btn:hover,
+    .small-btn:hover,
+    .send-btn:hover,
+    .menu-btn:hover,
+    .credits-btn:hover,
+    .back-btn:hover,
+    .suspect-tab:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 28px rgba(0, 212, 255, 0.45), 0 10px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    .mystery-notes {
+      border-top: 1px solid rgba(0, 212, 255, 0.2);
+      margin-top: 8px;
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      color: var(--text);
+    }
+
+    .note-card {
+      min-height: 58px;
+      border-radius: 12px;
+      border: 1px solid rgba(124, 58, 237, 0.4);
+      background: rgba(15, 52, 96, 0.25);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 12px 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(0, 212, 255, 0.15);
+    }
+
+    .note-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 4px;
+      font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .note-text {
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .credits-wrap {
+      margin-top: auto;
+      padding-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .credits-btn {
+      padding: 8px 20px;
+      font-size: 0.85rem;
+    }
+
+    .footer {
+      width: 100%;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    .visual-panel {
+      min-width: 0;
+      border-radius: 30px;
+      padding: 18px;
+      background: rgba(15, 52, 96, 0.3);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(0, 212, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .visual-panel::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 25%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .visual-panel img {
+      width: 100%;
+      height: 100%;
+      min-height: 560px;
+      display: block;
+      object-fit: cover;
+      border-radius: 14px;
+      background: #000;
+      filter: brightness(0.62) saturate(0.72) hue-rotate(-8deg);
+    }
+
+    .window-shine {
+      position: absolute;
+      top: 20px;
+      right: 170px;
+      width: 170px;
+      height: calc(100% - 40px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
+      transform: skewX(-28deg);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .window-shine.second {
+      right: 110px;
+      width: 58px;
+      opacity: 0.4;
+    }
+
+    .hazard-overlay {
+      position: absolute;
+      inset: 20px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(64, 255, 182, 0.08), transparent 18%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.18));
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .hazard-tag {
+      position: absolute;
+      left: 34px;
+      bottom: 34px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(233, 191, 63, 0.92);
+      color: #1e2125;
+      border: 3px solid #2d3034;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      z-index: 4;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.22);
+    }
+
+    .instructions-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .instructions-content {
+      background: var(--bg-mid);
+      border: 2px solid rgba(0, 212, 255, 0.4);
+      border-radius: 24px;
+      padding: 30px;
+      max-width: 700px;
+      width: 100%;
+      color: var(--text);
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .instructions-content h1 {
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+      color: var(--accent);
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .instructions-text {
+      text-align: left;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .instructions-text ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    .back-btn {
+      padding: 12px 24px;
+      font-size: 1rem;
+    }
+
+    .game-shell {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .game-title {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+    }
+
+    .game-subtitle {
+      color: var(--muted);
+      font-size: 0.96rem;
+      margin-top: 6px;
+    }
+
+    .game-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 18px;
+      min-height: 560px;
+    }
+
+    .game-sidebar {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .sidebar-title,
+    .chat-title {
+      font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-size: 0.88rem;
+    }
+
+    .suspect-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .suspect-tab {
+      width: 100%;
+      text-align: left;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 212, 255, 0.22);
+      background: rgba(10, 25, 50, 0.45);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .suspect-tab.active {
+      border-color: rgba(255, 209, 102, 0.75);
+      box-shadow: 0 0 0 1px rgba(255, 209, 102, 0.55), 0 0 20px rgba(255, 209, 102, 0.18);
+      background: rgba(35, 40, 70, 0.72);
+    }
+
+    .suspect-name {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .suspect-role {
+      display: block;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .sidebar-box {
+      border-radius: 14px;
+      background: rgba(10, 25, 50, 0.35);
+      border: 1px solid rgba(124, 58, 237, 0.25);
+      padding: 14px;
+      line-height: 1.55;
+    }
+
+    .small-btn,
+    .menu-btn,
+    .send-btn {
+      padding: 12px 14px;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    .game-panel {
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto 1fr auto auto;
+      gap: 14px;
+      min-height: 560px;
+    }
+
+    .chat-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid rgba(0, 212, 255, 0.16);
+      padding-bottom: 12px;
+    }
+
+    .chat-target {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .chat-status {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .chat-log {
+      border-radius: 16px;
+      background: rgba(7, 17, 34, 0.55);
+      border: 1px solid rgba(0, 212, 255, 0.16);
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 300px;
+      max-height: 100%;
+    }
+
+    .message {
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .message.user {
+      background: rgba(80, 160, 255, 0.14);
+      border-color: rgba(118, 183, 255, 0.2);
+      align-self: flex-end;
+      max-width: 82%;
+    }
+
+    .message.ai {
+      background: rgba(255, 207, 125, 0.12);
+      border-color: rgba(255, 207, 125, 0.18);
+      align-self: flex-start;
+      max-width: 88%;
+    }
+
+    .message.system {
+      background: rgba(174, 185, 199, 0.1);
+      border-color: rgba(174, 185, 199, 0.16);
+      color: var(--system);
+      align-self: center;
+      max-width: 92%;
+      text-align: center;
+    }
+
+    .message.win {
+      color: var(--success);
+      border-color: rgba(130, 255, 178, 0.28);
+    }
+
+    .message.lose {
+      color: var(--danger);
+      border-color: rgba(255, 123, 114, 0.28);
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quick-chip {
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 212, 255, 0.18);
+      background: rgba(15, 52, 96, 0.25);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-chip:hover {
+      background: rgba(15, 52, 96, 0.45);
+      transform: translateY(-2px);
+    }
+
+    .chat-input-row {
+      display: grid;
+      grid-template-columns: 1fr 160px;
+      gap: 12px;
+    }
+
+    .chat-input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 212, 255, 0.26);
+      background: rgba(10, 25, 50, 0.72);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .chat-input:focus {
+      border-color: rgba(0, 212, 255, 0.8);
+      box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12);
+    }
+
+    .helper-note {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1100px) {
+      .menu-layout {
+        grid-template-columns: 420px 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .menu-layout,
+      .game-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .title,
+      .game-title {
+        margin-left: 0;
+        text-align: center;
+      }
+
+      .visual-panel img {
+        min-height: 380px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 4px;
+      }
+
+      .menu-shell,
+      .game-shell {
+        width: 100%;
+        padding: 8px;
+        border-radius: 14px;
+      }
+
+      .title {
+        font-size: 2.5rem;
+      }
+
+      .chat-input-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main id="menuScreen" class="menu-shell">
+    <section class="menu-layout">
+      <div class="content-panel">
+        <div class="title">Lab Breakout</div>
+        <div class="left-stack">
+          <div class="primary-actions">
+            <button id="playBtn" class="action-btn">
+              <span class="label">Play</span>
+            </button>
+            <button id="instructionsBtn" class="action-btn">
+              <span class="label">Instructions</span>
+            </button>
+          </div>
+
+          <div class="mystery-notes">
+            <div class="note-card">
+              <div class="note-title">Case File</div>
+              <div class="note-text">A biohazard breach hit the lab around 3 AM. You need to interrogate the staff and expose the culprit.</div>
+            </div>
+            <div class="note-card">
+              <div class="note-title">Objective</div>
+              <div class="note-text">Question each suspect, look for contradictions, then accuse the right person before the case goes cold.</div>
+            </div>
+          </div>
+
+          <div class="credits-wrap">
+            <button class="credits-btn" type="button">Credits</button>
+            <div class="footer">v0.2.0a integrated interrogation build</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual-panel">
+        <img src="lab-breakout.jpg" alt="Lab Breakout background art" />
+        <div class="hazard-overlay"></div>
+        <div class="window-shine"></div>
+        <div class="window-shine second"></div>
+        <div class="hazard-tag">Quarantine Sector</div>
+      </div>
+    </section>
+  </main>
+
+  <section id="gameScreen" class="game-shell hidden" aria-label="Interrogation game screen">
+    <div class="game-header">
+      <div>
+        <div class="game-title">Interrogation Console</div>
+        <div class="game-subtitle">Converted from the Python suspect-chat system into browser JavaScript.</div>
+      </div>
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+        <button id="resetGameBtn" class="small-btn" type="button">New Case</button>
+        <button id="backToMenuBtn" class="menu-btn" type="button">Back to Menu</button>
+      </div>
+    </div>
+
+    <div class="game-layout">
+      <aside class="game-sidebar">
+        <div>
+          <div class="sidebar-title">Suspects</div>
+          <div id="suspectList" class="suspect-list"></div>
+        </div>
+
+        <div class="sidebar-box">
+          <div class="sidebar-title" style="margin-bottom:10px;">How to Accuse</div>
+          <div>Type <strong>ACCUSE Dr. Full Name</strong> in the chat box to make your final accusation.</div>
+        </div>
+
+        <div class="sidebar-box">
+          <div class="sidebar-title" style="margin-bottom:10px;">Game Notes</div>
+          <div id="caseSummary">The disease sample was taken from the storage room. One suspect is guilty and may slip under pressure.</div>
+        </div>
+
+        <div class="sidebar-box">
+          <div class="sidebar-title" style="margin-bottom:10px;">Embedded AI</div>
+          <div style="display:grid; gap:10px;">
+            <div class="helper-note">This private build uses one embedded Groq API key in the script, so players do not need to enter a key themselves.</div>
+            <div id="apiStatus" class="helper-note">Embedded AI is waiting for your built-in Groq API key.</div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="game-panel">
+        <div class="chat-topbar">
+          <div>
+            <div class="chat-title">Active Interrogation</div>
+            <div id="chatTarget" class="chat-target">Select a suspect</div>
+          </div>
+          <div id="chatStatus" class="chat-status">Choose a suspect from the list to begin.</div>
+        </div>
+
+        <div id="chatLog" class="chat-log"></div>
+
+        <div class="quick-actions" id="quickActions">
+          <button class="quick-chip" type="button" data-message="Where were you at 3 AM?">Ask about 3 AM</button>
+          <button class="quick-chip" type="button" data-message="What exactly were you working on?">Ask about task</button>
+          <button class="quick-chip" type="button" data-message="Why does your story feel off?">Apply pressure</button>
+          <button class="quick-chip" type="button" data-message="Did you go near storage?">Ask about storage</button>
+        </div>
+
+        <div class="chat-input-row">
+          <input id="chatInput" class="chat-input" type="text" placeholder="Type a question or ACCUSE Dr. Full Name" autocomplete="off">
+          <button id="sendBtn" class="send-btn" type="button">Send</button>
+        </div>
+
+        <div class="helper-note">This version runs the suspect AI locally in the browser with WebLLM. No API key is needed, but a WebGPU-capable browser is required and the first model download can take a while.</div>
+      </section>
+    </div>
+  </section>
+
+  <div id="instructionsOverlay" class="instructions-overlay hidden">
+    <div class="instructions-content">
+      <h1>How to Play Lab Breakout</h1>
+      <div class="instructions-text">
+        <p><strong>Objective:</strong> Interrogate the five scientists and work out who caused the breach.</p>
+        <p><strong>Flow:</strong></p>
+        <ul>
+          <li>Click <strong>Play</strong> to enter the interrogation console.</li>
+          <li>Select a suspect from the left panel.</li>
+          <li>Ask questions in the chat input, or use the quick prompt chips.</li>
+          <li>When you are ready, type <strong>ACCUSE Dr. Full Name</strong>.</li>
+        </ul>
+        <p><strong>Suspects:</strong></p>
+        <ul>
+          <li>Dr. Evelyn Kallen — Microbiologist</li>
+          <li>Dr. Marcus Reed — Bioinformatician</li>
+          <li>Dr. Lucia Chen — Senior Lab Technician</li>
+          <li>Dr. Samuel Ortiz — Quality Control Analyst</li>
+          <li>Dr. Penelope Grant — Sterile Area Technician</li>
+        </ul>
+        <p>The guilty suspect will sound plausible, but under pressure their details may wobble.</p>
+      </div>
+      <button id="backBtn" class="back-btn" type="button">Back to Menu</button>
+    </div>
+  </div>
+
+  <script type="module">
+    const EMBEDDED_GROQ_API_KEY = "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";
+    const GROQ_MODEL = "llama-3.3-70b-versatile";
+    const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+    const SUSPECTS = [
+      {
+        name: "Dr. Evelyn Kallen",
+        job: "Microbiologist",
+        personality: "sharp, proud, impatient under pressure"
+      },
+      {
+        name: "Dr. Marcus Reed",
+        job: "Bioinformatician",
+        personality: "calm, secretive, analytical"
+      },
+      {
+        name: "Dr. Lucia Chen",
+        job: "Senior Lab Technician",
+        personality: "stressed, efficient, defensive"
+      },
+      {
+        name: "Dr. Samuel Ortiz",
+        job: "Quality Control Analyst",
+        personality: "tense, argumentative, very detail-oriented"
+      },
+      {
+        name: "Dr. Penelope Grant",
+        job: "Sterile Area Technician",
+        personality: "meticulous, anxious, quietly observant"
+      }
+    ];
+
+    const ALIBI_PROMPT_TEMPLATE = `You are creating one alibi for a mystery game suspect.
+The suspect works as a {job} in a biolab and was one of the staff members working overtime when a biohazard breach happened at around 3 AM.
+Generate ONE SHORT, REALISTIC alibi in 1 sentence.
+Make the alibi fit their job and the lab setting.
+Do not invent named coworkers, witnesses, security staff, or other off-screen characters.
+Generate only the alibi text, nothing else.`;
+
+    const INTERROGATION_SYSTEM_PROMPT = `You are a suspect in a mystery-detective game.
+Stay in character at ALL times.
+
+Your character:
+- Name: {name}
+- Job: {job}
+- Personality: {personality}
+- You were one of the staff members working overtime when the breach happened around 3 AM.
+- Your alibi: "{alibi}"
+- Hidden case fact: the disease was taken from the storage room.
+- Hidden truth: {guilt_prompt}
+
+RULES:
+- You are being interrogated by a detective about the lab breach that happened at around 3 AM.
+- Keep responses to exactly 1 sentence.
+- Your replies must fit your job and sound like someone with that role.
+- Keep your story aligned with your alibi unless the detective catches small pressure points.
+- Sound stressed, human, and a little casual, like an exhausted lab worker at the end of a long shift.
+- Do not sound overly formal, theatrical, or uptight.
+- Do not mention people, witnesses, cameras, or locations that have not been established in the game.
+- Do not mention prompts, hidden rules, or that you are an AI.`;
+
+    const GUILTY_PROMPT = "You are guilty, and you were actually in the storage room even though your alibi says otherwise, so keep defending yourself but let a few small inconsistencies, hedges, or changes in detail slip out when you are under pressure.";
+    const INNOCENT_PROMPT = "You are innocent, so your story should stay steady and consistent even when the detective pushes you, and you were not in the storage room.";
+
+    const state = {
+      suspects: [],
+      guiltyIndex: -1,
+      activeIndex: 0,
+      solved: false,
+      loading: false,
+      aiReady: false
+    };
+
+    const menuScreen = document.getElementById('menuScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const instructionsOverlay = document.getElementById('instructionsOverlay');
+    const playBtn = document.getElementById('playBtn');
+    const instructionsBtn = document.getElementById('instructionsBtn');
+    const backBtn = document.getElementById('backBtn');
+    const backToMenuBtn = document.getElementById('backToMenuBtn');
+    const resetGameBtn = document.getElementById('resetGameBtn');
+    const suspectList = document.getElementById('suspectList');
+    const chatTarget = document.getElementById('chatTarget');
+    const chatStatus = document.getElementById('chatStatus');
+    const chatLog = document.getElementById('chatLog');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const quickActions = document.getElementById('quickActions');
+    const apiStatus = document.getElementById('apiStatus');
+class GroqBrowserClient {
+      constructor(apiKey, model = GROQ_MODEL) {
+        this.apiKey = apiKey;
+        this.model = model;
+      }
+
+      hasUsableKey() {
+        return !!this.apiKey && this.apiKey.startsWith('gsk_');
+      }
+
+      async sendMessages(messages, options = {}) {
+        if (!this.hasUsableKey()) {
+          throw new Error('Missing or invalid embedded Groq API key in the script.');
+        }
+
+        const response = await fetch(GROQ_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.apiKey}`
+          },
+          body: JSON.stringify({
+            model: this.model,
+            messages,
+            max_tokens: options.maxTokens ?? 180,
+            temperature: options.temperature ?? 0.8
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data?.error?.message || `Groq request failed with status ${response.status}.`);
+        }
+
+        const content = data?.choices?.[0]?.message?.content?.trim();
+        if (!content) {
+          throw new Error('Groq returned an empty response.');
+        }
+        return content;
+      }
+
+      async generateAlibi(job) {
+        return this.sendMessages([
+          { role: 'system', content: 'You create concise, believable alibis for biolab suspects.' },
+          { role: 'user', content: ALIBI_PROMPT_TEMPLATE.replace('{job}', job) }
+        ], { maxTokens: 80, temperature: 0.8 });
+      }
+    }
+
+    const aiClient = new GroqBrowserClient(EMBEDDED_GROQ_API_KEY);
+
+    function setApiStatus(text, tone = 'neutral') {
+      apiStatus.textContent = text;
+      apiStatus.style.color = tone === 'error'
+        ? 'var(--danger)'
+        : tone === 'success'
+          ? 'var(--success)'
+          : 'var(--muted)';
+    }
+
+    function appendMessage(type, text, extraClass = '') {
+      const div = document.createElement('div');
+      div.className = `message ${type} ${extraClass}`.trim();
+      div.textContent = text;
+      chatLog.appendChild(div);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function buildSuspectState(base, index) {
+      return {
+        ...base,
+        guilty: index === state.guiltyIndex,
+        pressure: 0,
+        alibi: '',
+        systemPrompt: '',
+        loading: true,
+        history: [
+          { type: 'system', text: 'Preparing interrogation file...' }
+        ],
+        messages: []
+      };
+    }
+
+    function renderSuspectTabs() {
+      suspectList.innerHTML = '';
+      state.suspects.forEach((suspect, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `suspect-tab ${index === state.activeIndex ? 'active' : ''}`;
+        button.innerHTML = `
+          <span class="suspect-name">${suspect.name}</span>
+          <span class="suspect-role">${suspect.job}${suspect.loading ? ' • loading...' : ''}</span>
+        `;
+        button.addEventListener('click', () => {
+          state.activeIndex = index;
+          renderSuspectTabs();
+          renderChat();
+        });
+        suspectList.appendChild(button);
+      });
+    }
+
+    function renderChat() {
+      const suspect = state.suspects[state.activeIndex];
+      if (!suspect) return;
+      chatTarget.textContent = `${suspect.name} — ${suspect.job}`;
+      chatStatus.textContent = state.solved
+        ? 'Case closed. Start a new case or return to the menu.'
+        : suspect.loading
+          ? 'Building suspect file with AI...'
+          : `${suspect.personality}. Watch for consistency under pressure.`;
+      chatLog.innerHTML = '';
+      suspect.history.forEach(entry => appendMessage(entry.type, entry.text, entry.variant || ''));
+    }
+
+    function parseAccusation(message) {
+      const prefix = 'accuse ';
+      const lowered = message.toLowerCase().trim();
+      if (!lowered.startsWith(prefix)) return null;
+      const accusedName = message.trim().slice(prefix.length).trim().toLowerCase();
+      return state.suspects.findIndex(s => s.name.toLowerCase() === accusedName);
+    }
+
+    function appendHistorySystem(text, variant = '') {
+      const suspect = state.suspects[state.activeIndex];
+      suspect.history.push({ type: 'system', text, variant });
+    }
+
+    function resolveAccusation(accusedIndex) {
+      const accused = state.suspects[accusedIndex];
+      const real = state.suspects[state.guiltyIndex];
+      state.solved = true;
+      if (accusedIndex === state.guiltyIndex) {
+        appendHistorySystem(`Congrats. You accused ${accused.name}, they crack, and the outbreak is stopped in time.`, 'win');
+      } else {
+        appendHistorySystem(`You lose. ${accused.name} was innocent. The real culprit was ${real.name}, and the virus spreads.`, 'lose');
+      }
+      appendHistorySystem('Case closed. Start a new case to play again.');
+      renderChat();
+    }
+
+    async function prepareSuspect(index) {
+      const suspect = state.suspects[index];
+      try {
+        const alibi = await aiClient.generateAlibi(suspect.job);
+        suspect.alibi = alibi;
+        suspect.systemPrompt = INTERROGATION_SYSTEM_PROMPT
+          .replace('{name}', suspect.name)
+          .replace('{job}', suspect.job)
+          .replace('{personality}', suspect.personality)
+          .replace('{alibi}', alibi)
+          .replace('{guilt_prompt}', suspect.guilty ? GUILTY_PROMPT : INNOCENT_PROMPT);
+
+        suspect.messages = [
+          { role: 'system', content: suspect.systemPrompt }
+        ];
+
+        const greetingRequest = [
+          ...suspect.messages,
+          {
+            role: 'user',
+            content: 'The detective just sat down. Greet them and react to being interrogated.'
+          }
+        ];
+
+        const greeting = await aiClient.sendMessages(greetingRequest, { maxTokens: 120, temperature: 0.8 });
+        suspect.messages.push({ role: 'assistant', content: greeting });
+        suspect.history = [
+          { type: 'ai', text: `${suspect.name}: ${greeting}` }
+        ];
+        suspect.loading = false;
+      } catch (error) {
+        suspect.loading = false;
+        suspect.history.push({
+          type: 'system',
+          text: `Embedded AI setup failed for ${suspect.name}: ${error.message}`,
+          variant: 'lose'
+        });
+      }
+      renderSuspectTabs();
+      if (index === state.activeIndex) renderChat();
+    }
+
+    async function startGame() {
+      instructionsOverlay.classList.add('hidden');
+      menuScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+      chatInput.value = '';
+      chatInput.focus();
+
+      state.aiReady = aiClient.hasUsableKey();
+      if (!state.aiReady) {
+        state.solved = false;
+        state.guiltyIndex = -1;
+        state.activeIndex = 0;
+        state.suspects = [
+          {
+            name: 'Embedded AI not loaded',
+            job: 'Add your embedded Groq key',
+            personality: 'waiting',
+            guilty: false,
+            pressure: 0,
+            alibi: '',
+            systemPrompt: '',
+            loading: false,
+            history: [
+              { type: 'system', text: 'This private build uses an embedded Groq key. Click New Case to start the AI setup.', variant: 'lose' }
+            ],
+            messages: []
+          }
+        ];
+        renderSuspectTabs();
+        renderChat();
+        setApiStatus('Add your embedded Groq key in the script, reload the page, then click New Case.', 'error');
+        return;
+      }
+
+      state.solved = false;
+      state.guiltyIndex = Math.floor(Math.random() * SUSPECTS.length);
+      state.activeIndex = 0;
+      state.suspects = SUSPECTS.map((suspect, index) => buildSuspectState(suspect, index));
+      renderSuspectTabs();
+      renderChat();
+      setApiStatus('Preparing suspect files with embedded AI...', 'neutral');
+      await Promise.allSettled(state.suspects.map((_, index) => prepareSuspect(index)));
+      setApiStatus(`Suspect files prepared with ${GROQ_MODEL}.`, 'success');
+    }
+
+    async function sendCurrentMessage(customMessage) {
+      if (state.solved || state.loading) return;
+      const message = (customMessage ?? chatInput.value).trim();
+      if (!message) return;
+
+      const suspect = state.suspects[state.activeIndex];
+      if (!suspect || suspect.loading) {
+        appendMessage('system', 'That suspect is still loading. Give it a moment.', 'lose');
+        return;
+      }
+
+      suspect.history.push({ type: 'user', text: `You: ${message}` });
+      const accusation = parseAccusation(message);
+      if (accusation !== -1 && accusation !== null) {
+        chatInput.value = '';
+        renderChat();
+        resolveAccusation(accusation);
+        return;
+      }
+      if (accusation === -1) {
+        suspect.history.push({ type: 'system', text: 'No suspect name matched that accusation. Use the exact full name.', variant: 'lose' });
+        chatInput.value = '';
+        renderChat();
+        return;
+      }
+
+      suspect.messages.push({ role: 'user', content: message });
+      suspect.history.push({ type: 'system', text: 'Thinking...' });
+      chatInput.value = '';
+      renderChat();
+      chatInput.focus();
+      state.loading = true;
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Thinking...';
+      chatStatus.textContent = `${suspect.name} is responding...`;
+
+      try {
+        const aiReply = await aiClient.sendMessages(suspect.messages, { maxTokens: 180, temperature: 0.8 });
+        suspect.messages.push({ role: 'assistant', content: aiReply });
+        suspect.history.pop();
+        suspect.history.push({ type: 'ai', text: `${suspect.name}: ${aiReply}` });
+      } catch (error) {
+        suspect.history.pop();
+        suspect.history.push({ type: 'system', text: `AI Error: ${error.message}`, variant: 'lose' });
+      } finally {
+        state.loading = false;
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Send';
+        renderChat();
+      }
+    }
+
+    playBtn.addEventListener('click', startGame);
+    instructionsBtn.addEventListener('click', () => instructionsOverlay.classList.remove('hidden'));
+    backBtn.addEventListener('click', () => instructionsOverlay.classList.add('hidden'));
+    backToMenuBtn.addEventListener('click', () => {
+      gameScreen.classList.add('hidden');
+      menuScreen.classList.remove('hidden');
+    });
+    resetGameBtn.addEventListener('click', startGame);
+    sendBtn.addEventListener('click', () => sendCurrentMessage());
+    chatInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        sendCurrentMessage();
+      }
+    });
+    quickActions.addEventListener('click', (event) => {
+      const btn = event.target.closest('[data-message]');
+      if (!btn) return;
+      chatInput.value = btn.dataset.message;
+      sendCurrentMessage(btn.dataset.message);
+    });
+
+    state.aiReady = aiClient.hasUsableKey();
+    setApiStatus(state.aiReady ? `Embedded AI ready with ${GROQ_MODEL}.` : 'Embedded AI is disabled until you paste your Groq key into the script.', state.aiReady ? 'success' : 'error');
+  </script>
+</body>
+
+</html>
