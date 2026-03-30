@@ -5,6 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lab Breakout - Menu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <style>
     /* ─── GLOBAL RESET ───────────────────────────────────────────────────────
        Forces all elements to use border-box sizing so padding and borders
@@ -19,40 +24,18 @@
        Central place to store all colours used across the game UI.
        Changing a value here updates it everywhere it's referenced. */
     :root {
-      --bg-dark: #060c1f;
-      /* Darkest background shade (bottom of gradient) */
-      --bg-mid: #0b1b3a;
-      /* Mid-tone background (middle of gradient) */
-      --bg-light: #142c5a;
-      /* Lightest background shade (top of gradient) */
-      --panel-dark: #0f172e;
-      /* Base colour for dark panels */
-      --panel-stroke: #05070f;
-      /* Outer border stroke on panels */
-      --inner-stroke: #4f6fb3;
-      /* Inner glow/stroke on panels */
-      --screen-frame: #5c6f9e;
-      /* Colour used for screen-like frame borders */
-      --screen-inner: #02040a;
-      /* Near-black fill inside screen frames */
-      --screen-shine: rgba(255, 255, 255, 0.05);
-      /* Subtle white sheen on screens */
-      --accent: #3a7cff;
-      /* Primary accent blue */
-      --accent-2: #7aa2ff;
-      /* Lighter secondary accent blue */
-      --text: #eef3ff;
-      /* Main body text colour */
-      --muted: #9fb4e5;
-      /* Dimmed/secondary text colour */
-      --button-shadow: #0b1326;
-      /* Drop-shadow colour for buttons */
-      --button-dark: #0f1f3f;
-      /* Dark fill used on some buttons */
-      --button-outline: #1a2e5a;
-      /* Outline stroke colour for buttons */
-      --button-muted: #2f4f91;
-      /* Muted blue used on secondary button states */
+      --bg-dark: #0f0f1e;
+      --bg-mid: #1a1a2e;
+      --bg-light: #16213e;
+      --panel-bg: rgba(15, 52, 96, 0.3);
+      --panel-border: #00d4ff;
+      --panel-outer: #0f0f1e;
+      --text: #f0f4f8;
+      --muted: #a0aec0;
+      --accent: #00d4ff;
+      --accent-dark: #7c3aed;
+      --button-blue: #00d4ff;
+      --button-blue-dark: #7c3aed;
     }
 
     /* ─── PAGE BODY ──────────────────────────────────────────────────────────
@@ -61,11 +44,12 @@
        overflow:hidden prevents scrollbars caused by the decorative grid overlay. */
     body {
       min-height: 100vh;
-      font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
+      font-family: 'Inter', sans-serif;
       /* Two-layer background: a radial glow at the top + a linear gradient */
       background:
-        radial-gradient(circle at top, rgba(90, 120, 255, 0.2), transparent 30%),
-        linear-gradient(180deg, var(--bg-light) 0%, var(--bg-mid) 45%, var(--bg-dark) 100%);
+        radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.15), transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.1), transparent 50%),
+        linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
       color: var(--text);
       display: flex;
       align-items: center;
@@ -82,12 +66,10 @@
       position: fixed;
       inset: 0;
       /* stretches edge-to-edge on all four sides */
-      background:
-        repeating-linear-gradient(90deg,
-          rgba(0, 0, 0, 0.04) 0 2px,
-          /* thin dark line every 120 px */
-          transparent 2px 120px);
-      opacity: 0.35;
+      background: repeating-linear-gradient(90deg,
+          rgba(0, 212, 255, 0.02) 0 2px,
+          transparent 2px 148px);
+      opacity: 0.15;
       pointer-events: none;
       /* let clicks pass through to real elements */
     }
@@ -141,28 +123,37 @@
       font-size: clamp(3.4rem, 6vw, 4.9rem);
       /* responsive: min 3.4rem, max 4.9rem */
       line-height: 0.92;
-      font-weight: 500;
+      font-weight: 700;
       letter-spacing: 0.04em;
-      color: #f5f3fb;
+      color: var(--text);
       margin: 6px 0 18px 22px;
       text-transform: uppercase;
-      font-family: "Comic Sans MS", "Trebuchet MS", cursive, sans-serif;
-      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.28);
+      font-family: 'IBM Plex Mono', monospace;
+      text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
       /* slight drop-shadow for depth */
+      animation: pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      from {
+        filter: brightness(1);
+      }
+
+      to {
+        filter: brightness(1.1);
+      }
     }
 
     /* ─── LEFT PANEL (dark card containing buttons & notes) ─────────────────
        Styled like a physical game-controller face: dark background, thick
        border, and an inner highlight stroke. */
     .left-stack {
-      background: linear-gradient(180deg, rgba(20, 24, 26, 0.88), rgba(30, 34, 36, 0.9));
-      border: 4px solid var(--panel-stroke);
+      background: var(--panel-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--panel-border);
       border-radius: 22px;
-      box-shadow:
-        inset 0 0 0 3px var(--inner-stroke),
-        /* inner blue glow ring */
-        0 6px 0 rgba(0, 0, 0, 0.22);
-      /* bottom shadow for 3-D lift */
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(0, 212, 255, 0.2);
       padding: 14px;
       display: flex;
       flex-direction: column;
@@ -187,32 +178,35 @@
       width: 100%;
       min-height: 74px;
       border-radius: 14px;
-      border: 4px solid #192223;
-      background: rgb(254, 222, 79);
-      /* bright yellow */
-      color: #15343b;
-      /* dark teal text for contrast */
+      border: 2px solid rgba(0, 212, 255, 0.3);
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
+      color: var(--accent);
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 22px 0 18px;
-      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.18);
-      /* top-edge highlight */
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
       cursor: pointer;
-      transition: transform 0.12s ease;
-      /* smooth movement on hover/press */
+      transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
     /* Lifts the button slightly when hovered */
     .action-btn:hover {
-      transform: translateY(-1px);
+      transform: translateY(-4px);
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.6), 0 12px 24px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(124, 58, 237, 0.3));
     }
 
     /* Pushes the button down to simulate being pressed */
     .action-btn:active {
-      transform: translateY(2px);
+      transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
     /* Icon inside the button (emoji or image) */
@@ -235,14 +229,14 @@
        Sits below the buttons. Separated from them by a faint top border.
        Displays the case file description and the player's objective. */
     .mystery-notes {
-      border-top: 3px solid rgba(160, 179, 182, 0.18);
+      border-top: 1px solid rgba(0, 212, 255, 0.2);
       /* subtle divider line */
       margin-top: 8px;
       padding-top: 16px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      color: #d9ece8;
+      color: var(--text);
     }
 
     /* ─── INDIVIDUAL NOTE CARD ───────────────────────────────────────────────
@@ -250,29 +244,30 @@
     .note-card {
       min-height: 58px;
       border-radius: 12px;
-      border: 3px solid #253336;
-      background: linear-gradient(180deg, #1f3f8f 0%, #162c63 100%);
-      /* deep blue gradient */
+      border: 1px solid rgba(124, 58, 237, 0.4);
+      background: rgba(15, 52, 96, 0.25);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       padding: 12px 16px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      /* top highlight */
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(0, 212, 255, 0.15);
     }
 
     /* Small uppercase label at the top of each note card (e.g. "CASE FILE") */
     .note-title {
-      font-size: 0.76rem;
+      font-size: 0.78rem;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: #a9d6cf;
-      /* minty teal for readability on dark blue */
+      letter-spacing: 0.15em;
+      color: var(--accent);
       margin-bottom: 4px;
+      font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
     }
 
     /* Main body text inside the note card */
     .note-text {
       font-size: 0.95rem;
-      font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
-      color: #f3f8f8;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
     }
 
     /* ─── CREDITS / FOOTER AREA ──────────────────────────────────────────────
@@ -291,23 +286,36 @@
 
     /* Grey secondary button for the Credits action */
     .credits-btn {
-      border: 3px solid #3b4045;
-      background: #727277;
-      color: #f0f0f2;
+      border: 2px solid rgba(0, 212, 255, 0.3);
+      background: rgba(15, 52, 96, 0.3);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      color: var(--accent);
       border-radius: 8px;
       padding: 8px 20px;
       text-transform: uppercase;
       font-size: 0.85rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .credits-btn:hover {
+      background: rgba(15, 52, 96, 0.5);
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
     }
 
     /* Small version label shown next to the Credits button */
     .footer {
       width: 100%;
       text-align: center;
-      color: #d4e6e4;
+      color: var(--muted);
       font-size: 0.9rem;
       opacity: 0.85;
       margin-top: 2px;
+      font-family: 'Inter', sans-serif;
     }
 
     /* ─── RIGHT-SIDE VISUAL PANEL (art / scene image) ────────────────────────
@@ -317,10 +325,11 @@
       min-width: 0;
       border-radius: 30px;
       padding: 18px;
-      background: linear-gradient(180deg, #2a3f78 0%, #18264d 100%);
-      border: 5px solid #2d3034;
-      box-shadow: inset 0 0 0 3px #b9c1c6;
-      /* inner silver ring */
+      background: rgba(15, 52, 96, 0.3);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(0, 212, 255, 0.2);
       position: relative;
       overflow: hidden;
       /* clips shine/overlay decorations to rounded corners */
@@ -601,7 +610,7 @@
       <div class="visual-panel">
 
         <!-- Lab background artwork; filtered darker to match the moody palette -->
-        <img src="mainimage.jpg" alt="Lab Breakout background art" />
+        <img src="lab-breakout.jpg" alt="Lab Breakout background art" />
 
         <!-- Semi-transparent tinted overlay — adds atmospheric depth over the image -->
         <div class="hazard-overlay"></div>

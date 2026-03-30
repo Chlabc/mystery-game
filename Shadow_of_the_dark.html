@@ -1,660 +1,880 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🚀 AMONG THE SUSPECTS</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚀 AMONG THE SUSPECTS</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
 
-  :root {
-    --red: #e74c3c;
-    --blue: #3498db;
-    --green: #2ecc71;
-    --yellow: #f1c40f;
-    --purple: #9b59b6;
-    --orange: #e67e22;
-    --cyan: #00f5ff;
-    --bg: #0a0a1a;
-    --panel: rgba(255,255,255,0.04);
-    --border: rgba(0,245,255,0.2);
-  }
+    :root {
+      --red: #e74c3c;
+      --blue: #3498db;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --purple: #9b59b6;
+      --orange: #e67e22;
+      --cyan: #00f5ff;
+      --bg: #0a0a1a;
+      --panel: rgba(255, 255, 255, 0.04);
+      --border: rgba(0, 245, 255, 0.2);
+    }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  body {
-    font-family: 'Share Tech Mono', monospace;
-    background: var(--bg);
-    color: #e0e0e0;
-    min-height: 100vh;
-    overflow-x: hidden;
-    background-image:
-      radial-gradient(ellipse at 20% 50%, rgba(0,245,255,0.03) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 20%, rgba(155,89,182,0.05) 0%, transparent 60%);
-  }
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background: var(--bg);
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(0, 245, 255, 0.03) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(155, 89, 182, 0.05) 0%, transparent 60%);
+    }
 
-  /* Starfield */
-  #stars {
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    pointer-events: none; z-index: 0;
-  }
-  .star {
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-    animation: twinkle linear infinite;
-  }
-  @keyframes twinkle {
-    0%,100% { opacity:0.1; } 50% { opacity:0.8; }
-  }
+    /* Starfield */
+    #stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  /* MAIN LAYOUT */
-  #game-wrapper {
-    position: relative; z-index: 1;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-  }
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle linear infinite;
+    }
 
-  /* HEADER */
-  .game-header {
-    text-align: center;
-    padding: 20px 0 10px;
-  }
-  .game-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: clamp(1.8rem, 5vw, 3.2rem);
-    font-weight: 900;
-    letter-spacing: 4px;
-    background: linear-gradient(135deg, var(--cyan), #a855f7, var(--cyan));
-    background-size: 200% 200%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: gradShift 3s ease infinite;
-    text-shadow: none;
-    filter: drop-shadow(0 0 20px rgba(0,245,255,0.5));
-  }
-  @keyframes gradShift {
-    0%,100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-  .subtitle {
-    color: rgba(0,245,255,0.5);
-    font-size: 0.75rem;
-    letter-spacing: 6px;
-    margin-top: 4px;
-  }
+    @keyframes twinkle {
 
-  /* TOP SECTION: MAP + CHAT */
-  .top-section {
-    display: grid;
-    grid-template-columns: 1fr 1.4fr;
-    gap: 16px;
-    margin-top: 20px;
-  }
+      0%,
+      100% {
+        opacity: 0.1;
+      }
 
-  /* STATION MAP */
-  .map-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    position: relative;
-    overflow: hidden;
-  }
-  .map-panel::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(0,245,255,0.02), transparent);
-    pointer-events: none;
-  }
-  .panel-label {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.6rem;
-    letter-spacing: 3px;
-    color: var(--cyan);
-    opacity: 0.7;
-    margin-bottom: 10px;
-  }
+      50% {
+        opacity: 0.8;
+      }
+    }
 
-  /* SVG MINI MAP */
-  #station-map {
-    width: 100%;
-    border-radius: 8px;
-    background: rgba(0,0,0,0.4);
-  }
+    /* MAIN LAYOUT */
+    #game-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
 
-  /* CHAT PANEL */
-  .chat-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-  }
-  #chat-feed {
-    flex: 1;
-    height: 280px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-right: 4px;
-  }
-  #chat-feed::-webkit-scrollbar { width: 4px; }
-  #chat-feed::-webkit-scrollbar-track { background: transparent; }
-  #chat-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    /* HEADER */
+    .game-header {
+      text-align: center;
+      padding: 20px 0 10px;
+    }
 
-  .chat-msg {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    animation: fadeSlideIn 0.3s ease;
-  }
-  @keyframes fadeSlideIn {
-    from { opacity:0; transform: translateY(6px); }
-    to { opacity:1; transform: translateY(0); }
-  }
-  .chat-avatar {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-  }
-  .chat-bubble {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px;
-    padding: 7px 11px;
-    font-size: 0.78rem;
-    line-height: 1.5;
-    flex: 1;
-  }
-  .chat-bubble .speaker-name {
-    font-weight: bold;
-    margin-bottom: 2px;
-    font-size: 0.68rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .chat-bubble.system {
-    border-color: rgba(0,245,255,0.3);
-    background: rgba(0,245,255,0.05);
-    color: var(--cyan);
-    text-align: center;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.68rem;
-    letter-spacing: 2px;
-  }
-  .chat-bubble.player-msg {
-    border-color: rgba(52,152,219,0.4);
-    background: rgba(52,152,219,0.1);
-  }
+    .game-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.8rem, 5vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, var(--cyan), #a855f7, var(--cyan));
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradShift 3s ease infinite;
+      text-shadow: none;
+      filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.5));
+    }
 
-  /* CREWMATES ROW */
-  .crew-section {
-    margin-top: 16px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-  }
-  .crew-grid {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    flex-wrap: wrap;
-    margin-top: 12px;
-  }
+    @keyframes gradShift {
 
-  /* SVG CREWMATE */
-  .crewmate-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: transform 0.2s;
-    position: relative;
-  }
-  .crewmate-card:hover { transform: translateY(-4px) scale(1.05); }
-  .crewmate-card.eliminated { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
-  .crewmate-card.dead::after {
-    content: '💀';
-    position: absolute;
-    top: -5px; right: -5px;
-    font-size: 1rem;
-  }
-  .crewmate-card.suspicious {
-    filter: drop-shadow(0 0 8px rgba(231,76,60,0.8));
-  }
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
 
-  .crew-name {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.6rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-  .crew-location {
-    font-size: 0.55rem;
-    color: rgba(255,255,255,0.4);
-    letter-spacing: 1px;
-  }
-  .suspicion-bar {
-    width: 56px;
-    height: 4px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .suspicion-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 1s ease;
-  }
+      50% {
+        background-position: 100% 50%;
+      }
+    }
 
-  /* STATUS PANEL */
-  .status-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-    margin-top: 16px;
-  }
-  .stat-box {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    text-align: center;
-  }
-  .stat-label {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.55rem;
-    letter-spacing: 3px;
-    color: rgba(255,255,255,0.4);
-    margin-bottom: 4px;
-  }
-  .stat-value {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--cyan);
-  }
+    .subtitle {
+      color: rgba(0, 245, 255, 0.5);
+      font-size: 0.75rem;
+      letter-spacing: 6px;
+      margin-top: 4px;
+    }
 
-  /* ACTIONS */
-  .actions-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .action-btn {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.65rem;
-    letter-spacing: 2px;
-    padding: 10px 20px;
-    border: 1px solid;
-    border-radius: 8px;
-    cursor: pointer;
-    background: transparent;
-    transition: all 0.2s;
-    text-transform: uppercase;
-  }
-  .action-btn.cyan { color: var(--cyan); border-color: var(--cyan); }
-  .action-btn.cyan:hover { background: rgba(0,245,255,0.15); box-shadow: 0 0 15px rgba(0,245,255,0.3); }
-  .action-btn.purple { color: #a855f7; border-color: #a855f7; }
-  .action-btn.purple:hover { background: rgba(168,85,247,0.15); box-shadow: 0 0 15px rgba(168,85,247,0.3); }
-  .action-btn.red { color: var(--red); border-color: var(--red); }
-  .action-btn.red:hover { background: rgba(231,76,60,0.15); box-shadow: 0 0 15px rgba(231,76,60,0.3); }
-  .action-btn.green { color: var(--green); border-color: var(--green); }
-  .action-btn.green:hover { background: rgba(46,204,113,0.15); box-shadow: 0 0 15px rgba(46,204,113,0.3); }
-  .action-btn:disabled { opacity:0.3; cursor:not-allowed; }
+    /* TOP SECTION: MAP + CHAT */
+    .top-section {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 16px;
+      margin-top: 20px;
+    }
 
-  /* VOTE MODAL */
-  #vote-modal {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.85);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
-  }
-  #vote-modal.show { display: flex; }
-  .vote-box {
-    background: #0d1225;
-    border: 1px solid rgba(0,245,255,0.3);
-    border-radius: 16px;
-    padding: 32px;
-    max-width: 500px;
-    width: 90%;
-    text-align: center;
-    box-shadow: 0 0 60px rgba(0,245,255,0.15);
-  }
-  .vote-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.2rem;
-    color: var(--cyan);
-    letter-spacing: 3px;
-    margin-bottom: 20px;
-  }
-  .vote-options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .vote-option-btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: white;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.9rem;
-  }
-  .vote-option-btn:hover {
-    background: rgba(231,76,60,0.2);
-    border-color: rgba(231,76,60,0.5);
-    transform: scale(1.02);
-  }
-  .vote-cancel {
-    margin-top: 16px;
-    font-family: 'Share Tech Mono', monospace;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.5);
-    padding: 8px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .vote-cancel:hover { border-color: rgba(255,255,255,0.5); color:white; }
+    /* STATION MAP */
+    .map-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+    }
 
-  /* RESULT OVERLAY */
-  #result-overlay {
-    display: none;
-    position: fixed; inset:0;
-    background: rgba(0,0,0,0.9);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-  }
-  #result-overlay.show { display: flex; }
-  .result-emoji { font-size: 5rem; animation: bounce 0.5s ease infinite alternate; }
-  @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.15); } }
-  .result-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 2.5rem;
-    font-weight: 900;
-    margin: 16px 0 8px;
-  }
-  .result-title.win { color: var(--green); text-shadow: 0 0 30px rgba(46,204,113,0.7); }
-  .result-title.lose { color: var(--red); text-shadow: 0 0 30px rgba(231,76,60,0.7); }
-  .result-sub {
-    font-size: 1rem;
-    color: rgba(255,255,255,0.6);
-    margin-bottom: 24px;
-  }
-  .play-again-btn {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.8rem;
-    letter-spacing: 3px;
-    padding: 14px 32px;
-    background: transparent;
-    border: 2px solid var(--cyan);
-    color: var(--cyan);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .play-again-btn:hover {
-    background: rgba(0,245,255,0.15);
-    box-shadow: 0 0 30px rgba(0,245,255,0.4);
-  }
+    .map-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 245, 255, 0.02), transparent);
+      pointer-events: none;
+    }
 
-  /* TYPING INDICATOR */
-  .typing-dots {
-    display: inline-flex; gap: 3px; align-items: center; padding: 4px;
-  }
-  .typing-dots span {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--cyan);
-    animation: dotPulse 1.2s ease infinite;
-  }
-  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes dotPulse { 0%,80%,100% { opacity:0.2; transform:scale(0.8); } 40% { opacity:1; transform:scale(1); } }
+    .panel-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      color: var(--cyan);
+      opacity: 0.7;
+      margin-bottom: 10px;
+    }
 
-  /* EMERGENCY BUTTON */
-  .emergency-btn {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.7rem;
-    letter-spacing: 2px;
-    padding: 12px 28px;
-    background: radial-gradient(circle, rgba(231,76,60,0.3), rgba(231,76,60,0.1));
-    border: 2px solid var(--red);
-    color: var(--red);
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-    box-shadow: 0 0 20px rgba(231,76,60,0.2);
-    animation: emergencyPulse 2s ease infinite;
-  }
-  @keyframes emergencyPulse {
-    0%,100% { box-shadow: 0 0 20px rgba(231,76,60,0.2); }
-    50% { box-shadow: 0 0 35px rgba(231,76,60,0.5); }
-  }
-  .emergency-btn:hover {
-    background: radial-gradient(circle, rgba(231,76,60,0.5), rgba(231,76,60,0.2));
-    transform: scale(1.05);
-  }
+    /* SVG MINI MAP */
+    #station-map {
+      width: 100%;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+    }
 
-  /* ROLE BADGE */
-  .role-badge {
-    display: inline-block;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.6rem;
-    letter-spacing: 2px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    margin-left: 8px;
-  }
-  .role-imposter { background: rgba(231,76,60,0.2); border: 1px solid var(--red); color: var(--red); }
-  .role-innocent { background: rgba(46,204,113,0.15); border: 1px solid var(--green); color: var(--green); }
+    /* CHAT PANEL */
+    .chat-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+    }
 
-  @media (max-width: 650px) {
-    .top-section { grid-template-columns: 1fr; }
-    .status-row { grid-template-columns: 1fr 1fr; }
-  }
-</style>
+    #chat-feed {
+      flex: 1;
+      height: 280px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    #chat-feed::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #chat-feed::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #chat-feed::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .chat-msg {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      animation: fadeSlideIn 0.3s ease;
+    }
+
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .chat-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .chat-bubble {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 7px 11px;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .chat-bubble .speaker-name {
+      font-weight: bold;
+      margin-bottom: 2px;
+      font-size: 0.68rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .chat-bubble.system {
+      border-color: rgba(0, 245, 255, 0.3);
+      background: rgba(0, 245, 255, 0.05);
+      color: var(--cyan);
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 2px;
+    }
+
+    .chat-bubble.player-msg {
+      border-color: rgba(52, 152, 219, 0.4);
+      background: rgba(52, 152, 219, 0.1);
+    }
+
+    /* CREWMATES ROW */
+    .crew-section {
+      margin-top: 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .crew-grid {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    /* SVG CREWMATE */
+    .crewmate-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      position: relative;
+    }
+
+    .crewmate-card:hover {
+      transform: translateY(-4px) scale(1.05);
+    }
+
+    .crewmate-card.eliminated {
+      opacity: 0.3;
+      filter: grayscale(1);
+      pointer-events: none;
+    }
+
+    .crewmate-card.dead::after {
+      content: '💀';
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      font-size: 1rem;
+    }
+
+    .crewmate-card.suspicious {
+      filter: drop-shadow(0 0 8px rgba(231, 76, 60, 0.8));
+    }
+
+    .crew-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .crew-location {
+      font-size: 0.55rem;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 1px;
+    }
+
+    .suspicion-bar {
+      width: 56px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .suspicion-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 1s ease;
+    }
+
+    /* STATUS PANEL */
+    .status-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .stat-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 3px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    /* ACTIONS */
+    .actions-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .action-btn {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      padding: 10px 20px;
+      border: 1px solid;
+      border-radius: 8px;
+      cursor: pointer;
+      background: transparent;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+
+    .action-btn.cyan {
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    .action-btn.cyan:hover {
+      background: rgba(0, 245, 255, 0.15);
+      box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+    }
+
+    .action-btn.purple {
+      color: #a855f7;
+      border-color: #a855f7;
+    }
+
+    .action-btn.purple:hover {
+      background: rgba(168, 85, 247, 0.15);
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+    }
+
+    .action-btn.red {
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    .action-btn.red:hover {
+      background: rgba(231, 76, 60, 0.15);
+      box-shadow: 0 0 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .action-btn.green {
+      color: var(--green);
+      border-color: var(--green);
+    }
+
+    .action-btn.green:hover {
+      background: rgba(46, 204, 113, 0.15);
+      box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* VOTE MODAL */
+    #vote-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    #vote-modal.show {
+      display: flex;
+    }
+
+    .vote-box {
+      background: #0d1225;
+      border: 1px solid rgba(0, 245, 255, 0.3);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(0, 245, 255, 0.15);
+    }
+
+    .vote-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      color: var(--cyan);
+      letter-spacing: 3px;
+      margin-bottom: 20px;
+    }
+
+    .vote-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .vote-option-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: white;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+    }
+
+    .vote-option-btn:hover {
+      background: rgba(231, 76, 60, 0.2);
+      border-color: rgba(231, 76, 60, 0.5);
+      transform: scale(1.02);
+    }
+
+    .vote-cancel {
+      margin-top: 16px;
+      font-family: 'Share Tech Mono', monospace;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.5);
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .vote-cancel:hover {
+      border-color: rgba(255, 255, 255, 0.5);
+      color: white;
+    }
+
+    /* RESULT OVERLAY */
+    #result-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    #result-overlay.show {
+      display: flex;
+    }
+
+    .result-emoji {
+      font-size: 5rem;
+      animation: bounce 0.5s ease infinite alternate;
+    }
+
+    @keyframes bounce {
+      from {
+        transform: scale(1);
+      }
+
+      to {
+        transform: scale(1.15);
+      }
+    }
+
+    .result-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin: 16px 0 8px;
+    }
+
+    .result-title.win {
+      color: var(--green);
+      text-shadow: 0 0 30px rgba(46, 204, 113, 0.7);
+    }
+
+    .result-title.lose {
+      color: var(--red);
+      text-shadow: 0 0 30px rgba(231, 76, 60, 0.7);
+    }
+
+    .result-sub {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 24px;
+    }
+
+    .play-again-btn {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      padding: 14px 32px;
+      background: transparent;
+      border: 2px solid var(--cyan);
+      color: var(--cyan);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .play-again-btn:hover {
+      background: rgba(0, 245, 255, 0.15);
+      box-shadow: 0 0 30px rgba(0, 245, 255, 0.4);
+    }
+
+    /* TYPING INDICATOR */
+    .typing-dots {
+      display: inline-flex;
+      gap: 3px;
+      align-items: center;
+      padding: 4px;
+    }
+
+    .typing-dots span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--cyan);
+      animation: dotPulse 1.2s ease infinite;
+    }
+
+    .typing-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes dotPulse {
+
+      0%,
+      80%,
+      100% {
+        opacity: 0.2;
+        transform: scale(0.8);
+      }
+
+      40% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* EMERGENCY BUTTON */
+    .emergency-btn {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      padding: 12px 28px;
+      background: radial-gradient(circle, rgba(231, 76, 60, 0.3), rgba(231, 76, 60, 0.1));
+      border: 2px solid var(--red);
+      color: var(--red);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      box-shadow: 0 0 20px rgba(231, 76, 60, 0.2);
+      animation: emergencyPulse 2s ease infinite;
+    }
+
+    @keyframes emergencyPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 20px rgba(231, 76, 60, 0.2);
+      }
+
+      50% {
+        box-shadow: 0 0 35px rgba(231, 76, 60, 0.5);
+      }
+    }
+
+    .emergency-btn:hover {
+      background: radial-gradient(circle, rgba(231, 76, 60, 0.5), rgba(231, 76, 60, 0.2));
+      transform: scale(1.05);
+    }
+
+    /* ROLE BADGE */
+    .role-badge {
+      display: inline-block;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-left: 8px;
+    }
+
+    .role-imposter {
+      background: rgba(231, 76, 60, 0.2);
+      border: 1px solid var(--red);
+      color: var(--red);
+    }
+
+    .role-innocent {
+      background: rgba(46, 204, 113, 0.15);
+      border: 1px solid var(--green);
+      color: var(--green);
+    }
+
+    @media (max-width: 650px) {
+      .top-section {
+        grid-template-columns: 1fr;
+      }
+
+      .status-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="stars"></div>
+  <div id="stars"></div>
 
-<div id="game-wrapper">
-  <div class="game-header">
-    <div class="game-title">AMONG THE SUSPECTS</div>
-    <div class="subtitle">◆ SPACE STATION MYSTERY ◆</div>
-  </div>
-
-  <div class="top-section">
-    <!-- MAP -->
-    <div class="map-panel">
-      <div class="panel-label">◈ STATION MAP</div>
-      <svg id="station-map" viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
-        <!-- BG -->
-        <rect width="220" height="200" fill="#050810"/>
-        <!-- Grid lines -->
-        <line x1="0" y1="100" x2="220" y2="100" stroke="rgba(0,245,255,0.05)" stroke-width="1"/>
-        <line x1="110" y1="0" x2="110" y2="200" stroke="rgba(0,245,255,0.05)" stroke-width="1"/>
-        <!-- Rooms -->
-        <rect x="10" y="10" width="70" height="50" rx="5" fill="rgba(0,245,255,0.07)" stroke="rgba(0,245,255,0.3)" stroke-width="1.5"/>
-        <text x="45" y="30" text-anchor="middle" fill="rgba(0,245,255,0.8)" font-size="6" font-family="monospace">ENGINE</text>
-        <text x="45" y="42" text-anchor="middle" fill="rgba(0,245,255,0.4)" font-size="5" font-family="monospace">ROOM</text>
-
-        <rect x="140" y="10" width="70" height="50" rx="5" fill="rgba(155,89,182,0.07)" stroke="rgba(155,89,182,0.4)" stroke-width="1.5"/>
-        <text x="175" y="30" text-anchor="middle" fill="rgba(155,89,182,0.9)" font-size="6" font-family="monospace">MEDBAY</text>
-
-        <rect x="60" y="75" width="100" height="55" rx="5" fill="rgba(241,196,15,0.05)" stroke="rgba(241,196,15,0.3)" stroke-width="1.5"/>
-        <text x="110" y="100" text-anchor="middle" fill="rgba(241,196,15,0.8)" font-size="7" font-family="monospace">CAFETERIA</text>
-
-        <rect x="10" y="145" width="70" height="45" rx="5" fill="rgba(46,204,113,0.07)" stroke="rgba(46,204,113,0.3)" stroke-width="1.5"/>
-        <text x="45" y="165" text-anchor="middle" fill="rgba(46,204,113,0.8)" font-size="6" font-family="monospace">NAVIGATION</text>
-
-        <rect x="140" y="145" width="70" height="45" rx="5" fill="rgba(231,76,60,0.07)" stroke="rgba(231,76,60,0.3)" stroke-width="1.5"/>
-        <text x="175" y="165" text-anchor="middle" fill="rgba(231,76,60,0.8)" font-size="6" font-family="monospace">REACTOR</text>
-
-        <!-- Corridors -->
-        <line x1="80" y1="35" x2="140" y2="35" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
-        <line x1="45" y1="60" x2="80" y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
-        <line x1="160" y1="60" x2="150" y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
-        <line x1="45" y1="130" x2="45" y2="145" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
-        <line x1="175" y1="130" x2="175" y2="145" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
-
-        <!-- Player dots on map -->
-        <circle id="mapDot-You" cx="110" cy="102" r="4" fill="#3498db"/>
-        <circle id="mapDot-Red" cx="45" cy="35" r="3.5" fill="#e74c3c"/>
-        <circle id="mapDot-Blue" cx="175" cy="35" r="3.5" fill="#3498db" opacity="0.7"/>
-        <circle id="mapDot-Green" cx="110" cy="100" r="3.5" fill="#2ecc71"/>
-        <circle id="mapDot-Yellow" cx="45" cy="155" r="3.5" fill="#f1c40f"/>
-        <circle id="mapDot-Purple" cx="175" cy="155" r="3.5" fill="#9b59b6"/>
-      </svg>
+  <div id="game-wrapper">
+    <div class="game-header">
+      <div class="game-title">AMONG THE SUSPECTS</div>
+      <div class="subtitle">◆ SPACE STATION MYSTERY ◆</div>
     </div>
 
-    <!-- CHAT -->
-    <div class="chat-panel">
-      <div class="panel-label">◈ COMM LOG</div>
-      <div id="chat-feed"></div>
+    <div class="top-section">
+      <!-- MAP -->
+      <div class="map-panel">
+        <div class="panel-label">◈ STATION MAP</div>
+        <svg id="station-map" viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- BG -->
+          <rect width="220" height="200" fill="#050810" />
+          <!-- Grid lines -->
+          <line x1="0" y1="100" x2="220" y2="100" stroke="rgba(0,245,255,0.05)" stroke-width="1" />
+          <line x1="110" y1="0" x2="110" y2="200" stroke="rgba(0,245,255,0.05)" stroke-width="1" />
+          <!-- Rooms -->
+          <rect x="10" y="10" width="70" height="50" rx="5" fill="rgba(0,245,255,0.07)" stroke="rgba(0,245,255,0.3)"
+            stroke-width="1.5" />
+          <text x="45" y="30" text-anchor="middle" fill="rgba(0,245,255,0.8)" font-size="6"
+            font-family="monospace">ENGINE</text>
+          <text x="45" y="42" text-anchor="middle" fill="rgba(0,245,255,0.4)" font-size="5"
+            font-family="monospace">ROOM</text>
+
+          <rect x="140" y="10" width="70" height="50" rx="5" fill="rgba(155,89,182,0.07)" stroke="rgba(155,89,182,0.4)"
+            stroke-width="1.5" />
+          <text x="175" y="30" text-anchor="middle" fill="rgba(155,89,182,0.9)" font-size="6"
+            font-family="monospace">MEDBAY</text>
+
+          <rect x="60" y="75" width="100" height="55" rx="5" fill="rgba(241,196,15,0.05)" stroke="rgba(241,196,15,0.3)"
+            stroke-width="1.5" />
+          <text x="110" y="100" text-anchor="middle" fill="rgba(241,196,15,0.8)" font-size="7"
+            font-family="monospace">CAFETERIA</text>
+
+          <rect x="10" y="145" width="70" height="45" rx="5" fill="rgba(46,204,113,0.07)" stroke="rgba(46,204,113,0.3)"
+            stroke-width="1.5" />
+          <text x="45" y="165" text-anchor="middle" fill="rgba(46,204,113,0.8)" font-size="6"
+            font-family="monospace">NAVIGATION</text>
+
+          <rect x="140" y="145" width="70" height="45" rx="5" fill="rgba(231,76,60,0.07)" stroke="rgba(231,76,60,0.3)"
+            stroke-width="1.5" />
+          <text x="175" y="165" text-anchor="middle" fill="rgba(231,76,60,0.8)" font-size="6"
+            font-family="monospace">REACTOR</text>
+
+          <!-- Corridors -->
+          <line x1="80" y1="35" x2="140" y2="35" stroke="rgba(255,255,255,0.15)" stroke-width="2" />
+          <line x1="45" y1="60" x2="80" y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="2" />
+          <line x1="160" y1="60" x2="150" y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="2" />
+          <line x1="45" y1="130" x2="45" y2="145" stroke="rgba(255,255,255,0.15)" stroke-width="2" />
+          <line x1="175" y1="130" x2="175" y2="145" stroke="rgba(255,255,255,0.15)" stroke-width="2" />
+
+          <!-- Player dots on map -->
+          <circle id="mapDot-You" cx="110" cy="102" r="4" fill="#3498db" />
+          <circle id="mapDot-Red" cx="45" cy="35" r="3.5" fill="#e74c3c" />
+          <circle id="mapDot-Blue" cx="175" cy="35" r="3.5" fill="#3498db" opacity="0.7" />
+          <circle id="mapDot-Green" cx="110" cy="100" r="3.5" fill="#2ecc71" />
+          <circle id="mapDot-Yellow" cx="45" cy="155" r="3.5" fill="#f1c40f" />
+          <circle id="mapDot-Purple" cx="175" cy="155" r="3.5" fill="#9b59b6" />
+        </svg>
+      </div>
+
+      <!-- CHAT -->
+      <div class="chat-panel">
+        <div class="panel-label">◈ COMM LOG</div>
+        <div id="chat-feed"></div>
+      </div>
+    </div>
+
+    <!-- CREW -->
+    <div class="crew-section">
+      <div class="panel-label">◈ CREW STATUS</div>
+      <div id="crew-grid" class="crew-grid"></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="status-row">
+      <div class="stat-box">
+        <div class="stat-label">YOUR ROLE</div>
+        <div class="stat-value" id="stat-role">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">ALIVE</div>
+        <div class="stat-value" id="stat-alive">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">ROUND</div>
+        <div class="stat-value" id="stat-round">1</div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions-row">
+      <button class="action-btn cyan" id="btn-clue" onclick="revealClue()">🔍 REVEAL CLUE</button>
+      <button class="action-btn purple" id="btn-interrogate" onclick="interrogateRandom()">💬 INTERROGATE</button>
+      <button class="action-btn green" id="btn-discuss" onclick="triggerDiscussion()">🧠 DISCUSS</button>
+      <button class="emergency-btn" id="btn-vote" onclick="openVoteModal()">🚨 EMERGENCY MEETING</button>
     </div>
   </div>
 
-  <!-- CREW -->
-  <div class="crew-section">
-    <div class="panel-label">◈ CREW STATUS</div>
-    <div id="crew-grid" class="crew-grid"></div>
-  </div>
-
-  <!-- STATS -->
-  <div class="status-row">
-    <div class="stat-box">
-      <div class="stat-label">YOUR ROLE</div>
-      <div class="stat-value" id="stat-role">—</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-label">ALIVE</div>
-      <div class="stat-value" id="stat-alive">—</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-label">ROUND</div>
-      <div class="stat-value" id="stat-round">1</div>
+  <!-- VOTE MODAL -->
+  <div id="vote-modal">
+    <div class="vote-box">
+      <div class="vote-title">🗳 CAST YOUR VOTE</div>
+      <div class="vote-options" id="vote-options"></div>
+      <button class="vote-cancel" onclick="closeVoteModal()">Cancel</button>
     </div>
   </div>
 
-  <!-- ACTIONS -->
-  <div class="actions-row">
-    <button class="action-btn cyan" id="btn-clue" onclick="revealClue()">🔍 REVEAL CLUE</button>
-    <button class="action-btn purple" id="btn-interrogate" onclick="interrogateRandom()">💬 INTERROGATE</button>
-    <button class="action-btn green" id="btn-discuss" onclick="triggerDiscussion()">🧠 DISCUSS</button>
-    <button class="emergency-btn" id="btn-vote" onclick="openVoteModal()">🚨 EMERGENCY MEETING</button>
+  <!-- RESULT OVERLAY -->
+  <div id="result-overlay">
+    <div class="result-emoji" id="result-emoji"></div>
+    <div class="result-title" id="result-title"></div>
+    <div class="result-sub" id="result-sub"></div>
+    <button class="play-again-btn" id="result-play-btn" onclick="restartGame()">↺ PLAY AGAIN</button>
   </div>
-</div>
 
-<!-- VOTE MODAL -->
-<div id="vote-modal">
-  <div class="vote-box">
-    <div class="vote-title">🗳 CAST YOUR VOTE</div>
-    <div class="vote-options" id="vote-options"></div>
-    <button class="vote-cancel" onclick="closeVoteModal()">Cancel</button>
-  </div>
-</div>
+  <script>
+    // ============================================================
+    // GAME STATE
+    // ============================================================
+    const PLAYER_COLORS = {
+      You: '#3498db', Red: '#e74c3c', Blue: '#5dade2',
+      Green: '#2ecc71', Yellow: '#f1c40f', Purple: '#9b59b6'
+    };
 
-<!-- RESULT OVERLAY -->
-<div id="result-overlay">
-  <div class="result-emoji" id="result-emoji"></div>
-  <div class="result-title" id="result-title"></div>
-  <div class="result-sub" id="result-sub"></div>
-  <button class="play-again-btn" onclick="location.reload()">↺ PLAY AGAIN</button>
-</div>
+    const LOCATIONS = ['Engine Room', 'Medbay', 'Cafeteria', 'Navigation', 'Reactor'];
 
-<script>
-// ============================================================
-// GAME STATE
-// ============================================================
-const PLAYER_COLORS = {
-  You: '#3498db', Red: '#e74c3c', Blue: '#5dade2',
-  Green: '#2ecc71', Yellow: '#f1c40f', Purple: '#9b59b6'
-};
+    const MAP_POS = {
+      'Engine Room': { cx: 45, cy: 35 },
+      'Medbay': { cx: 175, cy: 35 },
+      'Cafeteria': { cx: 110, cy: 102 },
+      'Navigation': { cx: 45, cy: 155 },
+      'Reactor': { cx: 175, cy: 155 },
+    };
 
-const LOCATIONS = ['Engine Room', 'Medbay', 'Cafeteria', 'Navigation', 'Reactor'];
+    const PERSONALITIES = {
+      Red: { trait: 'nervous', icon: '😰', quirk: 'always stutters when nervous' },
+      Blue: { trait: 'confident', icon: '😏', quirk: 'deflects accusations with wit' },
+      Green: { trait: 'logical', icon: '🧐', quirk: 'demands evidence for everything' },
+      Yellow: { trait: 'suspicious', icon: '🤨', quirk: 'suspects everyone' },
+      Purple: { trait: 'quiet', icon: '😶', quirk: 'only speaks when spoken to' },
+    };
 
-const MAP_POS = {
-  'Engine Room':  { cx: 45,  cy: 35  },
-  'Medbay':       { cx: 175, cy: 35  },
-  'Cafeteria':    { cx: 110, cy: 102 },
-  'Navigation':   { cx: 45,  cy: 155 },
-  'Reactor':      { cx: 175, cy: 155 },
-};
+    let state = {
+      players: ['You', 'Red', 'Blue', 'Green', 'Yellow', 'Purple'],
+      alive: [],
+      roles: {},
+      alibis: {},
+      clues: {},
+      suspicion: {},
+      imposter: null,
+      round: 1,
+      msgQueue: [],
+      isTyping: false,
+      gameOver: false,
+    };
 
-const PERSONALITIES = {
-  Red:    { trait:'nervous',    icon:'😰', quirk:'always stutters when nervous' },
-  Blue:   { trait:'confident',  icon:'😏', quirk:'deflects accusations with wit' },
-  Green:  { trait:'logical',    icon:'🧐', quirk:'demands evidence for everything' },
-  Yellow: { trait:'suspicious', icon:'🤨', quirk:'suspects everyone' },
-  Purple: { trait:'quiet',      icon:'😶', quirk:'only speaks when spoken to' },
-};
-
-let state = {
-  players: ['You','Red','Blue','Green','Yellow','Purple'],
-  alive: [],
-  roles: {},
-  alibis: {},
-  clues: {},
-  suspicion: {},
-  imposter: null,
-  round: 1,
-  msgQueue: [],
-  isTyping: false,
-  gameOver: false,
-};
-
-// ============================================================
-// STARS
-// ============================================================
-function makeStars() {
-  const container = document.getElementById('stars');
-  for (let i = 0; i < 120; i++) {
-    const s = document.createElement('div');
-    s.className = 'star';
-    const sz = Math.random() * 2 + 0.5;
-    s.style.cssText = `
+    // ============================================================
+    // STARS
+    // ============================================================
+    function makeStars() {
+      const container = document.getElementById('stars');
+      for (let i = 0; i < 120; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const sz = Math.random() * 2 + 0.5;
+        s.style.cssText = `
       width:${sz}px; height:${sz}px;
-      left:${Math.random()*100}%;
-      top:${Math.random()*100}%;
-      animation-duration:${2+Math.random()*4}s;
-      animation-delay:${Math.random()*4}s;
+      left:${Math.random() * 100}%;
+      top:${Math.random() * 100}%;
+      animation-duration:${2 + Math.random() * 4}s;
+      animation-delay:${Math.random() * 4}s;
     `;
-    container.appendChild(s);
-  }
-}
+        container.appendChild(s);
+      }
+    }
 
-// ============================================================
-// CREWMATE SVG
-// ============================================================
-function crewmateSVG(color, size=56) {
-  return `<svg width="${size}" height="${size}" viewBox="0 0 40 44" xmlns="http://www.w3.org/2000/svg">
+    // ============================================================
+    // CREWMATE SVG
+    // ============================================================
+    function crewmateSVG(color, size = 56) {
+      return `<svg width="${size}" height="${size}" viewBox="0 0 40 44" xmlns="http://www.w3.org/2000/svg">
     <!-- Body -->
     <ellipse cx="20" cy="28" rx="13" ry="14" fill="${color}"/>
     <!-- Head -->
@@ -670,10 +890,10 @@ function crewmateSVG(color, size=56) {
     <!-- Shadow under body -->
     <ellipse cx="20" cy="42" rx="10" ry="2" fill="black" opacity="0.15"/>
   </svg>`;
-}
+    }
 
-function crewmateDeadSVG(color, size=56) {
-  return `<svg width="${size}" height="${size}" viewBox="0 0 40 44" xmlns="http://www.w3.org/2000/svg">
+    function crewmateDeadSVG(color, size = 56) {
+      return `<svg width="${size}" height="${size}" viewBox="0 0 40 44" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="20" cy="28" rx="13" ry="14" fill="${color}" opacity="0.5"/>
     <ellipse cx="20" cy="13" rx="11" ry="11" fill="${color}" opacity="0.5"/>
     <ellipse cx="21" cy="11" rx="7" ry="6" fill="#555" opacity="0.7"/>
@@ -683,454 +903,476 @@ function crewmateDeadSVG(color, size=56) {
     <text x="20" y="15" text-anchor="middle" font-size="9">✕</text>
     <text x="23" y="15" text-anchor="middle" font-size="9">✕</text>
   </svg>`;
-}
+    }
 
-// ============================================================
-// RENDER CREW
-// ============================================================
-function renderCrew() {
-  const grid = document.getElementById('crew-grid');
-  grid.innerHTML = '';
+    // ============================================================
+    // RENDER CREW
+    // ============================================================
+    function renderCrew() {
+      const grid = document.getElementById('crew-grid');
+      grid.innerHTML = '';
 
-  state.players.forEach(p => {
-    if (p === 'You') return;
-    const color = PLAYER_COLORS[p];
-    const susp = state.suspicion[p] || 0;
-    const isAlive = state.alive.includes(p);
-    const card = document.createElement('div');
-    card.className = 'crewmate-card' + (isAlive ? '' : ' eliminated dead');
-    card.id = 'card-' + p;
-    card.onclick = () => accusePlayer(p);
+      state.players.forEach(p => {
+        if (p === 'You') return;
+        const color = PLAYER_COLORS[p];
+        const susp = state.suspicion[p] || 0;
+        const isAlive = state.alive.includes(p);
+        const card = document.createElement('div');
+        card.className = 'crewmate-card' + (isAlive ? '' : ' eliminated dead');
+        card.id = 'card-' + p;
+        card.onclick = () => accusePlayer(p);
 
-    const suspColor = susp > 7 ? '#e74c3c' : susp > 4 ? '#f39c12' : '#2ecc71';
+        const suspColor = susp > 7 ? '#e74c3c' : susp > 4 ? '#f39c12' : '#2ecc71';
 
-    card.innerHTML = `
+        card.innerHTML = `
       <div>${isAlive ? crewmateSVG(color, 56) : crewmateDeadSVG(color, 56)}</div>
       <div class="crew-name" style="color:${color}">${p}</div>
       <div class="crew-location">${state.alibis[p] || '?'}</div>
       <div class="suspicion-bar">
-        <div class="suspicion-fill" style="width:${susp*10}%;background:${suspColor}"></div>
+        <div class="suspicion-fill" style="width:${susp * 10}%;background:${suspColor}"></div>
       </div>
     `;
 
-    if (susp >= 8 && isAlive) card.classList.add('suspicious');
-    grid.appendChild(card);
-  });
-}
+        if (susp >= 8 && isAlive) card.classList.add('suspicious');
+        grid.appendChild(card);
+      });
+    }
 
-// ============================================================
-// CHAT SYSTEM WITH TYPING EFFECT
-// ============================================================
-function addSystemMsg(text) {
-  const feed = document.getElementById('chat-feed');
-  const div = document.createElement('div');
-  div.className = 'chat-msg';
-  div.innerHTML = `<div class="chat-bubble system">${text}</div>`;
-  feed.appendChild(div);
-  feed.scrollTop = feed.scrollHeight;
-}
+    // ============================================================
+    // CHAT SYSTEM WITH TYPING EFFECT
+    // ============================================================
+    function addSystemMsg(text) {
+      const feed = document.getElementById('chat-feed');
+      const div = document.createElement('div');
+      div.className = 'chat-msg';
+      div.innerHTML = `<div class="chat-bubble system">${text}</div>`;
+      feed.appendChild(div);
+      feed.scrollTop = feed.scrollHeight;
+    }
 
-function typeMessage(speaker, text, color, icon, isPlayer=false, callback) {
-  const feed = document.getElementById('chat-feed');
+    function typeMessage(speaker, text, color, icon, isPlayer = false, callback) {
+      const feed = document.getElementById('chat-feed');
 
-  // Typing indicator
-  const typingEl = document.createElement('div');
-  typingEl.className = 'chat-msg';
-  typingEl.innerHTML = `
+      // Typing indicator
+      const typingEl = document.createElement('div');
+      typingEl.className = 'chat-msg';
+      typingEl.innerHTML = `
     <div class="chat-avatar" style="background:${color}22;border:1px solid ${color}44">${icon}</div>
-    <div class="chat-bubble ${isPlayer?'player-msg':''}">
+    <div class="chat-bubble ${isPlayer ? 'player-msg' : ''}">
       <div class="speaker-name" style="color:${color}">${speaker}</div>
       <div class="typing-dots"><span></span><span></span><span></span></div>
     </div>`;
-  feed.appendChild(typingEl);
-  feed.scrollTop = feed.scrollHeight;
-
-  const delay = 600 + Math.random() * 700;
-  setTimeout(() => {
-    // Replace typing with real text
-    const bubble = typingEl.querySelector('.chat-bubble');
-    const textEl = typingEl.querySelector('.typing-dots');
-    textEl.innerHTML = '';
-
-    let i = 0;
-    const chars = text.split('');
-    const typeInterval = setInterval(() => {
-      textEl.textContent += chars[i];
-      i++;
+      feed.appendChild(typingEl);
       feed.scrollTop = feed.scrollHeight;
-      if (i >= chars.length) {
-        clearInterval(typeInterval);
-        if (callback) callback();
+
+      const delay = 600 + Math.random() * 700;
+      setTimeout(() => {
+        // Replace typing with real text
+        const bubble = typingEl.querySelector('.chat-bubble');
+        const textEl = typingEl.querySelector('.typing-dots');
+        textEl.innerHTML = '';
+
+        let i = 0;
+        const chars = text.split('');
+        const typeInterval = setInterval(() => {
+          textEl.textContent += chars[i];
+          i++;
+          feed.scrollTop = feed.scrollHeight;
+          if (i >= chars.length) {
+            clearInterval(typeInterval);
+            if (callback) callback();
+          }
+        }, 18);
+      }, delay);
+    }
+
+    function queueMsg(speaker, text, color, icon, isPlayer = false) {
+      state.msgQueue.push({ speaker, text, color, icon, isPlayer });
+      if (!state.isTyping) processQueue();
+    }
+
+    function processQueue() {
+      if (state.msgQueue.length === 0) { state.isTyping = false; return; }
+      state.isTyping = true;
+      const msg = state.msgQueue.shift();
+      typeMessage(msg.speaker, msg.text, msg.color, msg.icon, msg.isPlayer, () => {
+        setTimeout(processQueue, 200);
+      });
+    }
+
+    // ============================================================
+    // SETUP
+    // ============================================================
+    function startGame() {
+      state.alive = [...state.players];
+
+      // Assign imposter
+      state.imposter = state.players[Math.floor(Math.random() * state.players.length)];
+
+      // Roles
+      state.players.forEach(p => {
+        state.roles[p] = (p === state.imposter) ? 'Imposter' : 'Innocent';
+        state.alibis[p] = LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)];
+        state.suspicion[p] = Math.floor(Math.random() * 5) + 1;
+      });
+
+      // If imposter: slightly inflate their suspicion
+      if (state.imposter !== 'You') {
+        state.suspicion[state.imposter] = Math.min(9, state.suspicion[state.imposter] + 2);
       }
-    }, 18);
-  }, delay);
-}
 
-function queueMsg(speaker, text, color, icon, isPlayer=false) {
-  state.msgQueue.push({ speaker, text, color, icon, isPlayer });
-  if (!state.isTyping) processQueue();
-}
+      // Clues
+      state.players.forEach(p => {
+        const others = state.players.filter(x => x !== p);
+        const suspect = others[Math.floor(Math.random() * others.length)];
+        state.clues[p] = `${suspect} was spotted near ${state.alibis[suspect]}`;
+      });
 
-function processQueue() {
-  if (state.msgQueue.length === 0) { state.isTyping = false; return; }
-  state.isTyping = true;
-  const msg = state.msgQueue.shift();
-  typeMessage(msg.speaker, msg.text, msg.color, msg.icon, msg.isPlayer, () => {
-    setTimeout(processQueue, 200);
-  });
-}
+      // Update stats
+      updateStats();
+      renderCrew();
+      updateMapDots();
 
-// ============================================================
-// SETUP
-// ============================================================
-function startGame() {
-  state.alive = [...state.players];
-
-  // Assign imposter
-  state.imposter = state.players[Math.floor(Math.random() * state.players.length)];
-
-  // Roles
-  state.players.forEach(p => {
-    state.roles[p] = (p === state.imposter) ? 'Imposter' : 'Innocent';
-    state.alibis[p] = LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)];
-    state.suspicion[p] = Math.floor(Math.random() * 5) + 1;
-  });
-
-  // If imposter: slightly inflate their suspicion
-  if (state.imposter !== 'You') {
-    state.suspicion[state.imposter] = Math.min(9, state.suspicion[state.imposter] + 2);
-  }
-
-  // Clues
-  state.players.forEach(p => {
-    const others = state.players.filter(x => x !== p);
-    const suspect = others[Math.floor(Math.random() * others.length)];
-    state.clues[p] = `${suspect} was spotted near ${state.alibis[suspect]}`;
-  });
-
-  // Update stats
-  updateStats();
-  renderCrew();
-  updateMapDots();
-
-  // Intro messages
-  setTimeout(() => {
-    addSystemMsg('⚡ EMERGENCY BROADCAST — BODY FOUND ON DECK 7');
-    setTimeout(() => {
-      addSystemMsg(`🚀 GAME STARTED — ${state.players.length} CREW ABOARD`);
+      // Intro messages
       setTimeout(() => {
-        const role = state.roles['You'];
-        queueMsg('SYSTEM', `You are the ${role}. ${role === 'Imposter' ? 'Eliminate crew without getting caught!' : 'Find the imposter before it\'s too late!'}`, '#00f5ff', '🖥️');
+        addSystemMsg('⚡ EMERGENCY BROADCAST — BODY FOUND ON DECK 7');
         setTimeout(() => {
-          queueMsg('SYSTEM', `Your clue: "${state.clues['You']}"`, '#f1c40f', '🔍');
-          setTimeout(() => triggerDiscussion(), 2000);
-        }, 1500);
-      }, 800);
-    }, 600);
-  }, 500);
-}
-
-function updateStats() {
-  const role = state.roles['You'];
-  const roleEl = document.getElementById('stat-role');
-  roleEl.textContent = role;
-  roleEl.style.color = role === 'Imposter' ? '#e74c3c' : '#2ecc71';
-  document.getElementById('stat-alive').textContent = state.alive.length;
-  document.getElementById('stat-round').textContent = state.round;
-}
-
-function updateMapDots() {
-  state.players.forEach(p => {
-    const dot = document.getElementById('mapDot-' + p);
-    if (!dot) return;
-    const loc = state.alibis[p];
-    const pos = MAP_POS[loc];
-    if (pos) {
-      dot.setAttribute('cx', pos.cx + (Math.random()*6-3));
-      dot.setAttribute('cy', pos.cy + (Math.random()*6-3));
+          addSystemMsg(`🚀 GAME STARTED — ${state.players.length} CREW ABOARD`);
+          setTimeout(() => {
+            const role = state.roles['You'];
+            queueMsg('SYSTEM', `You are the ${role}. ${role === 'Imposter' ? 'Eliminate crew without getting caught!' : 'Find the imposter before it\'s too late!'}`, '#00f5ff', '🖥️');
+            setTimeout(() => {
+              queueMsg('SYSTEM', `Your clue: "${state.clues['You']}"`, '#f1c40f', '🔍');
+              setTimeout(() => triggerDiscussion(), 2000);
+            }, 1500);
+          }, 800);
+        }, 600);
+      }, 500);
     }
-    if (!state.alive.includes(p)) {
-      dot.setAttribute('opacity', '0.2');
-      dot.setAttribute('fill', '#888');
+
+    function updateStats() {
+      const role = state.roles['You'];
+      const roleEl = document.getElementById('stat-role');
+      roleEl.textContent = role;
+      roleEl.style.color = role === 'Imposter' ? '#e74c3c' : '#2ecc71';
+      document.getElementById('stat-alive').textContent = state.alive.length;
+      document.getElementById('stat-round').textContent = state.round;
     }
-  });
-}
 
-// ============================================================
-// DISCUSSION
-// ============================================================
-const ARGUE_LINES = [
-  "Wait, that doesn't add up at all.",
-  "I was literally right there the whole time!",
-  "Can anyone vouch for where you were?",
-  "That's exactly what an imposter would say.",
-  "I saw you near the vents. Explain that.",
-  "My alibi checks out. Ask anyone.",
-  "Something's off. I don't trust this.",
-  "Why are you so quick to deflect?",
-  "Let's think logically here.",
-  "I've been watching. Something is wrong.",
-];
-
-function triggerDiscussion() {
-  if (state.gameOver) return;
-
-  const aliveNpcs = state.alive.filter(p => p !== 'You');
-  if (aliveNpcs.length === 0) return;
-
-  // Each NPC says where they were
-  aliveNpcs.slice(0, 3).forEach((p, i) => {
-    setTimeout(() => {
-      const pers = PERSONALITIES[p];
-      queueMsg(p, `I was in ${state.alibis[p]}. ${getPersonalityLine(p)}`,
-        PLAYER_COLORS[p], pers.icon);
-    }, i * 800);
-  });
-
-  // Cross accusations
-  setTimeout(() => {
-    const p1 = aliveNpcs[Math.floor(Math.random() * aliveNpcs.length)];
-    const p2 = aliveNpcs.filter(x=>x!==p1)[Math.floor(Math.random()*(aliveNpcs.length-1))];
-    if (p2) {
-      queueMsg(p1, `${p2}... ${ARGUE_LINES[Math.floor(Math.random()*ARGUE_LINES.length)]}`,
-        PLAYER_COLORS[p1], PERSONALITIES[p1].icon);
+    function updateMapDots() {
+      state.players.forEach(p => {
+        const dot = document.getElementById('mapDot-' + p);
+        if (!dot) return;
+        const loc = state.alibis[p];
+        const pos = MAP_POS[loc];
+        if (pos) {
+          dot.setAttribute('cx', pos.cx + (Math.random() * 6 - 3));
+          dot.setAttribute('cy', pos.cy + (Math.random() * 6 - 3));
+        }
+        if (!state.alive.includes(p)) {
+          dot.setAttribute('opacity', '0.2');
+          dot.setAttribute('fill', '#888');
+        }
+      });
     }
-    if (p2) {
-      setTimeout(() => {
-        queueMsg(p2, `I literally just told everyone where I was! Stop pointing fingers at me.`,
-          PLAYER_COLORS[p2], PERSONALITIES[p2].icon);
-      }, 1200);
-    }
-  }, aliveNpcs.length * 800 + 600);
-}
 
-function getPersonalityLine(p) {
-  const lines = {
-    Red: ["I swear I didn't do anything...", "P-please believe me.", "I'm scared."],
-    Blue: ["And I can prove it.", "Come at me if you're suspicious.", "Good luck finding anything on me."],
-    Green: ["That's statistically significant.", "Based on the evidence...", "Logic says I'm clear."],
-    Yellow: ["But honestly, I'm watching everyone.", "Trust nobody.", "Something's not right here."],
-    Purple: ["...", "Fine.", "Whatever."],
-  };
-  const opts = lines[p] || ["Okay."];
-  return opts[Math.floor(Math.random()*opts.length)];
-}
-
-// ============================================================
-// INTERROGATE
-// ============================================================
-function interrogateRandom() {
-  const aliveNpcs = state.alive.filter(p => p !== 'You');
-  if (!aliveNpcs.length) return;
-  const target = aliveNpcs[Math.floor(Math.random() * aliveNpcs.length)];
-
-  queueMsg('You', `${target}, explain exactly where you were and what you saw.`,
-    '#3498db', '🧑‍🚀', true);
-
-  const pers = PERSONALITIES[target];
-  const isImposter = state.roles[target] === 'Imposter';
-
-  const responses = isImposter ? [
-    `I... look, I was in ${state.alibis[target]}. There were people around. Ask them.`,
-    `Why are you singling me out? That's suspicious in itself.`,
-    `I have nothing to hide. Completely nothing. Why would I? I don't.`,
-    `Fine. I was in ${state.alibis[target]}. Alone. No, wait — with someone. I forget who.`,
-  ] : [
-    `I was in ${state.alibis[target]} the whole time. I can describe everything I saw.`,
-    `I heard something near the vents but I wasn't sure who it was.`,
-    `Honestly? I'm pointing at ${getRandomSuspect(target)}.`,
-    `Check the cameras in ${state.alibis[target]}. You'll see I was there.`,
-  ];
-
-  setTimeout(() => {
-    queueMsg(target, responses[Math.floor(Math.random()*responses.length)],
-      PLAYER_COLORS[target], pers.icon);
-  }, 1000);
-}
-
-function getRandomSuspect(exclude) {
-  const others = state.alive.filter(p => p !== exclude && p !== 'You');
-  return others[Math.floor(Math.random()*others.length)] || 'someone';
-}
-
-// ============================================================
-// ACCUSE
-// ============================================================
-function accusePlayer(name) {
-  if (state.gameOver || !state.alive.includes(name)) return;
-
-  queueMsg('You', `I'm accusing ${name}! Something doesn't add up with their story.`,
-    '#3498db', '🧑‍🚀', true);
-
-  state.suspicion[name] = Math.min(10, (state.suspicion[name]||0) + 2);
-  renderCrew();
-
-  // Others react
-  setTimeout(() => {
-    const reactors = state.alive.filter(p => p !== 'You' && p !== name);
-    const reactor = reactors[Math.floor(Math.random() * reactors.length)];
-    if (reactor) {
-      const reacts = [
-        `Interesting. I've had my eye on ${name} too.`,
-        `Whoa, bold move. Let's hear ${name} defend themselves.`,
-        `I don't know... ${name} seemed normal to me.`,
-        `Now that you mention it, I did see ${name} acting weird earlier.`,
-      ];
-      queueMsg(reactor, reacts[Math.floor(Math.random()*reacts.length)],
-        PLAYER_COLORS[reactor], PERSONALITIES[reactor].icon);
-    }
-  }, 1500);
-
-  setTimeout(() => {
-    const isImposter = state.roles[name] === 'Imposter';
-    const defenses = isImposter ? [
-      `That's insane! You're just trying to deflect attention from yourself!`,
-      `I was in ${state.alibis[name]}! I have NOTHING to do with this!`,
-      `So now we're just throwing accusations around? Really?`,
-    ] : [
-      `WHAT? I'm literally the most innocent person here!`,
-      `Fine. Think whatever you want. But you're wasting time.`,
-      `Check the facts. I'm not the one you're looking for.`,
+    // ============================================================
+    // DISCUSSION
+    // ============================================================
+    const ARGUE_LINES = [
+      "Wait, that doesn't add up at all.",
+      "I was literally right there the whole time!",
+      "Can anyone vouch for where you were?",
+      "That's exactly what an imposter would say.",
+      "I saw you near the vents. Explain that.",
+      "My alibi checks out. Ask anyone.",
+      "Something's off. I don't trust this.",
+      "Why are you so quick to deflect?",
+      "Let's think logically here.",
+      "I've been watching. Something is wrong.",
     ];
-    queueMsg(name, defenses[Math.floor(Math.random()*defenses.length)],
-      PLAYER_COLORS[name], PERSONALITIES[name]?.icon || '😶');
-  }, 2800);
-}
 
-// ============================================================
-// CLUE
-// ============================================================
-function revealClue() {
-  queueMsg('You', `Here's what I know: "${state.clues['You']}"`,
-    '#3498db', '🧑‍🚀', true);
+    function triggerDiscussion() {
+      if (state.gameOver) return;
 
-  // Random NPC adds to it
-  setTimeout(() => {
-    const npc = state.alive.filter(p=>p!=='You')[0];
-    if (npc) {
-      queueMsg(npc, `That lines up with what I saw. I also noticed something near the ${LOCATIONS[Math.floor(Math.random()*LOCATIONS.length)]}.`,
-        PLAYER_COLORS[npc], PERSONALITIES[npc].icon);
+      const aliveNpcs = state.alive.filter(p => p !== 'You');
+      if (aliveNpcs.length === 0) return;
+
+      // Each NPC says where they were
+      aliveNpcs.slice(0, 3).forEach((p, i) => {
+        setTimeout(() => {
+          const pers = PERSONALITIES[p];
+          queueMsg(p, `I was in ${state.alibis[p]}. ${getPersonalityLine(p)}`,
+            PLAYER_COLORS[p], pers.icon);
+        }, i * 800);
+      });
+
+      // Cross accusations
+      setTimeout(() => {
+        const p1 = aliveNpcs[Math.floor(Math.random() * aliveNpcs.length)];
+        const p2 = aliveNpcs.filter(x => x !== p1)[Math.floor(Math.random() * (aliveNpcs.length - 1))];
+        if (p2) {
+          queueMsg(p1, `${p2}... ${ARGUE_LINES[Math.floor(Math.random() * ARGUE_LINES.length)]}`,
+            PLAYER_COLORS[p1], PERSONALITIES[p1].icon);
+        }
+        if (p2) {
+          setTimeout(() => {
+            queueMsg(p2, `I literally just told everyone where I was! Stop pointing fingers at me.`,
+              PLAYER_COLORS[p2], PERSONALITIES[p2].icon);
+          }, 1200);
+        }
+      }, aliveNpcs.length * 800 + 600);
     }
-  }, 2000);
-}
 
-// ============================================================
-// VOTE
-// ============================================================
-function openVoteModal() {
-  if (state.gameOver) return;
-  const modal = document.getElementById('vote-modal');
-  const opts = document.getElementById('vote-options');
-  opts.innerHTML = '';
+    function getPersonalityLine(p) {
+      const lines = {
+        Red: ["I swear I didn't do anything...", "P-please believe me.", "I'm scared."],
+        Blue: ["And I can prove it.", "Come at me if you're suspicious.", "Good luck finding anything on me."],
+        Green: ["That's statistically significant.", "Based on the evidence...", "Logic says I'm clear."],
+        Yellow: ["But honestly, I'm watching everyone.", "Trust nobody.", "Something's not right here."],
+        Purple: ["...", "Fine.", "Whatever."],
+      };
+      const opts = lines[p] || ["Okay."];
+      return opts[Math.floor(Math.random() * opts.length)];
+    }
 
-  state.alive.filter(p => p !== 'You').forEach(p => {
-    const btn = document.createElement('button');
-    btn.className = 'vote-option-btn';
-    btn.innerHTML = `
+    // ============================================================
+    // INTERROGATE
+    // ============================================================
+    function interrogateRandom() {
+      const aliveNpcs = state.alive.filter(p => p !== 'You');
+      if (!aliveNpcs.length) return;
+      const target = aliveNpcs[Math.floor(Math.random() * aliveNpcs.length)];
+
+      queueMsg('You', `${target}, explain exactly where you were and what you saw.`,
+        '#3498db', '🧑‍🚀', true);
+
+      const pers = PERSONALITIES[target];
+      const isImposter = state.roles[target] === 'Imposter';
+
+      const responses = isImposter ? [
+        `I... look, I was in ${state.alibis[target]}. There were people around. Ask them.`,
+        `Why are you singling me out? That's suspicious in itself.`,
+        `I have nothing to hide. Completely nothing. Why would I? I don't.`,
+        `Fine. I was in ${state.alibis[target]}. Alone. No, wait — with someone. I forget who.`,
+      ] : [
+        `I was in ${state.alibis[target]} the whole time. I can describe everything I saw.`,
+        `I heard something near the vents but I wasn't sure who it was.`,
+        `Honestly? I'm pointing at ${getRandomSuspect(target)}.`,
+        `Check the cameras in ${state.alibis[target]}. You'll see I was there.`,
+      ];
+
+      setTimeout(() => {
+        queueMsg(target, responses[Math.floor(Math.random() * responses.length)],
+          PLAYER_COLORS[target], pers.icon);
+      }, 1000);
+    }
+
+    function getRandomSuspect(exclude) {
+      const others = state.alive.filter(p => p !== exclude && p !== 'You');
+      return others[Math.floor(Math.random() * others.length)] || 'someone';
+    }
+
+    // ============================================================
+    // ACCUSE
+    // ============================================================
+    function accusePlayer(name) {
+      if (state.gameOver || !state.alive.includes(name)) return;
+
+      queueMsg('You', `I'm accusing ${name}! Something doesn't add up with their story.`,
+        '#3498db', '🧑‍🚀', true);
+
+      state.suspicion[name] = Math.min(10, (state.suspicion[name] || 0) + 2);
+      renderCrew();
+
+      // Others react
+      setTimeout(() => {
+        const reactors = state.alive.filter(p => p !== 'You' && p !== name);
+        const reactor = reactors[Math.floor(Math.random() * reactors.length)];
+        if (reactor) {
+          const reacts = [
+            `Interesting. I've had my eye on ${name} too.`,
+            `Whoa, bold move. Let's hear ${name} defend themselves.`,
+            `I don't know... ${name} seemed normal to me.`,
+            `Now that you mention it, I did see ${name} acting weird earlier.`,
+          ];
+          queueMsg(reactor, reacts[Math.floor(Math.random() * reacts.length)],
+            PLAYER_COLORS[reactor], PERSONALITIES[reactor].icon);
+        }
+      }, 1500);
+
+      setTimeout(() => {
+        const isImposter = state.roles[name] === 'Imposter';
+        const defenses = isImposter ? [
+          `That's insane! You're just trying to deflect attention from yourself!`,
+          `I was in ${state.alibis[name]}! I have NOTHING to do with this!`,
+          `So now we're just throwing accusations around? Really?`,
+        ] : [
+          `WHAT? I'm literally the most innocent person here!`,
+          `Fine. Think whatever you want. But you're wasting time.`,
+          `Check the facts. I'm not the one you're looking for.`,
+        ];
+        queueMsg(name, defenses[Math.floor(Math.random() * defenses.length)],
+          PLAYER_COLORS[name], PERSONALITIES[name]?.icon || '😶');
+      }, 2800);
+    }
+
+    // ============================================================
+    // CLUE
+    // ============================================================
+    function revealClue() {
+      queueMsg('You', `Here's what I know: "${state.clues['You']}"`,
+        '#3498db', '🧑‍🚀', true);
+
+      // Random NPC adds to it
+      setTimeout(() => {
+        const npc = state.alive.filter(p => p !== 'You')[0];
+        if (npc) {
+          queueMsg(npc, `That lines up with what I saw. I also noticed something near the ${LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)]}.`,
+            PLAYER_COLORS[npc], PERSONALITIES[npc].icon);
+        }
+      }, 2000);
+    }
+
+    // ============================================================
+    // VOTE
+    // ============================================================
+    function openVoteModal() {
+      if (state.gameOver) return;
+      const modal = document.getElementById('vote-modal');
+      const opts = document.getElementById('vote-options');
+      opts.innerHTML = '';
+
+      state.alive.filter(p => p !== 'You').forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'vote-option-btn';
+        btn.innerHTML = `
       ${crewmateSVG(PLAYER_COLORS[p], 28)}
       <span style="color:${PLAYER_COLORS[p]};font-weight:bold">${p}</span>
       <span style="color:rgba(255,255,255,0.4);font-size:0.75rem">— ${state.alibis[p]}</span>
       <span style="margin-left:auto;color:#e74c3c;font-size:0.75rem">suspicion: ${state.suspicion[p]}/10</span>
     `;
-    btn.onclick = () => { closeVoteModal(); submitVote(p); };
-    opts.appendChild(btn);
-  });
+        btn.onclick = () => { closeVoteModal(); submitVote(p); };
+        opts.appendChild(btn);
+      });
 
-  modal.classList.add('show');
-}
-
-function closeVoteModal() {
-  document.getElementById('vote-modal').classList.remove('show');
-}
-
-function submitVote(chosen) {
-  addSystemMsg(`🗳 EMERGENCY MEETING — VOTING IN PROGRESS`);
-
-  queueMsg('You', `I vote to eject ${chosen}!`, '#3498db', '🧑‍🚀', true);
-
-  // NPC votes
-  const votes = { You: chosen };
-  state.alive.filter(p => p !== 'You').forEach(p => {
-    if (state.roles[p] === 'Imposter') {
-      // Imposter votes for highest suspicion non-self
-      const target = state.alive
-        .filter(x => x !== p && x !== 'You')
-        .sort((a,b) => (state.suspicion[b]||0) - (state.suspicion[a]||0))[0] || 'You';
-      votes[p] = target;
-    } else {
-      // Random innocent vote
-      const targets = state.alive.filter(x => x !== p);
-      votes[p] = targets[Math.floor(Math.random() * targets.length)];
+      modal.classList.add('show');
     }
-  });
 
-  // Tally
-  const count = {};
-  Object.values(votes).forEach(v => { count[v] = (count[v]||0) + 1; });
-  const eliminated = Object.keys(count).sort((a,b) => count[b]-count[a])[0];
+    function closeVoteModal() {
+      document.getElementById('vote-modal').classList.remove('show');
+    }
 
-  setTimeout(() => {
-    // Show NPC votes
-    state.alive.filter(p => p !== 'You').forEach((p, i) => {
+    function submitVote(chosen) {
+      addSystemMsg(`🗳 EMERGENCY MEETING — VOTING IN PROGRESS`);
+
+      queueMsg('You', `I vote to eject ${chosen}!`, '#3498db', '🧑‍🚀', true);
+
+      // NPC votes
+      const votes = { You: chosen };
+      state.alive.filter(p => p !== 'You').forEach(p => {
+        if (state.roles[p] === 'Imposter') {
+          // Imposter votes for highest suspicion non-self
+          const target = state.alive
+            .filter(x => x !== p && x !== 'You')
+            .sort((a, b) => (state.suspicion[b] || 0) - (state.suspicion[a] || 0))[0] || 'You';
+          votes[p] = target;
+        } else {
+          // Random innocent vote
+          const targets = state.alive.filter(x => x !== p);
+          votes[p] = targets[Math.floor(Math.random() * targets.length)];
+        }
+      });
+
+      // Tally
+      const count = {};
+      Object.values(votes).forEach(v => { count[v] = (count[v] || 0) + 1; });
+      const eliminated = Object.keys(count).sort((a, b) => count[b] - count[a])[0];
+
       setTimeout(() => {
-        queueMsg(p, `I vote ${votes[p]}.`, PLAYER_COLORS[p], PERSONALITIES[p]?.icon || '👤');
-      }, i * 600);
-    });
+        // Show NPC votes
+        state.alive.filter(p => p !== 'You').forEach((p, i) => {
+          setTimeout(() => {
+            queueMsg(p, `I vote ${votes[p]}.`, PLAYER_COLORS[p], PERSONALITIES[p]?.icon || '👤');
+          }, i * 600);
+        });
 
-    setTimeout(() => {
-      addSystemMsg(`☠️ ${eliminated.toUpperCase()} WAS EJECTED WITH ${count[eliminated]} VOTES`);
-      state.alive = state.alive.filter(p => p !== eliminated);
-
-      const card = document.getElementById('card-' + eliminated);
-      if (card) card.classList.add('eliminated', 'dead');
-
-      updateStats();
-      updateMapDots();
-
-      if (eliminated === 'You') {
-        // Player ejected
-        setTimeout(() => endGame(false, 'You were ejected!', eliminated), 1000);
-      } else if (state.roles[eliminated] === 'Imposter') {
-        setTimeout(() => endGame(true, `${eliminated} was the imposter!`, eliminated), 1000);
-      } else {
-        // Wrong ejection
         setTimeout(() => {
-          addSystemMsg(`❌ ${eliminated.toUpperCase()} WAS INNOCENT`);
-          state.round++;
-          state.alive.forEach(p => {
-            state.alibis[p] = LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)];
-          });
+          addSystemMsg(`☠️ ${eliminated.toUpperCase()} WAS EJECTED WITH ${count[eliminated]} VOTES`);
+          state.alive = state.alive.filter(p => p !== eliminated);
+
+          const card = document.getElementById('card-' + eliminated);
+          if (card) card.classList.add('eliminated', 'dead');
+
           updateStats();
           updateMapDots();
-          renderCrew();
-          setTimeout(() => triggerDiscussion(), 1200);
-        }, 1000);
 
-        // Check if imposter wins
-        const aliveInnocents = state.alive.filter(p => p !== state.imposter && p !== 'You');
-        if (aliveInnocents.length <= 1) {
-          setTimeout(() => endGame(false, `${state.imposter} won!`, state.imposter), 2500);
-        }
-      }
-    }, state.alive.length * 600 + 800);
-  }, 1000);
-}
+          if (eliminated === 'You') {
+            // Player ejected
+            setTimeout(() => endGame(false, 'You were ejected!', eliminated), 1000);
+          } else if (state.roles[eliminated] === 'Imposter') {
+            setTimeout(() => endGame(true, `${eliminated} was the imposter!`, eliminated), 1000);
+          } else {
+            // Wrong ejection
+            setTimeout(() => {
+              addSystemMsg(`❌ ${eliminated.toUpperCase()} WAS INNOCENT`);
+              state.round++;
+              state.alive.forEach(p => {
+                state.alibis[p] = LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)];
+              });
+              updateStats();
+              updateMapDots();
+              renderCrew();
+              setTimeout(() => triggerDiscussion(), 1200);
+            }, 1000);
 
-function endGame(win, sub, imposterName) {
-  state.gameOver = true;
-  const overlay = document.getElementById('result-overlay');
-  document.getElementById('result-emoji').textContent = win ? '🎉' : '💀';
-  document.getElementById('result-title').textContent = win ? 'CREWMATES WIN' : 'IMPOSTER WINS';
-  document.getElementById('result-title').className = 'result-title ' + (win ? 'win' : 'lose');
-  document.getElementById('result-sub').textContent = sub + (imposterName && !win ? ` The imposter was ${imposterName}.` : '');
-  overlay.classList.add('show');
-}
+            // Check if imposter wins
+            const aliveInnocents = state.alive.filter(p => p !== state.imposter && p !== 'You');
+            if (aliveInnocents.length <= 1) {
+              setTimeout(() => endGame(false, `${state.imposter} won!`, state.imposter), 2500);
+            }
+          }
+        }, state.alive.length * 600 + 800);
+      }, 1000);
+    }
 
-// ============================================================
-// INIT
-// ============================================================
-makeStars();
-startGame();
-</script>
+    function endGame(win, sub, imposterName) {
+      state.gameOver = true;
+      const overlay = document.getElementById('result-overlay');
+      const resultPlayBtn = document.getElementById('result-play-btn');
+
+      document.getElementById('result-emoji').textContent = win ? '🎉' : '💀';
+      document.getElementById('result-title').textContent = win ? 'CREWMATES WIN' : 'GAME OVER';
+      document.getElementById('result-title').className = 'result-title ' + (win ? 'win' : 'lose');
+      document.getElementById('result-sub').textContent = (win ? 'Great job! ' : 'Oh no! ') + sub + (imposterName && !win ? ` The imposter was ${imposterName}.` : '');
+
+      resultPlayBtn.textContent = win ? '↺ PLAY AGAIN' : '↺ TRY AGAIN';
+      resultPlayBtn.classList.toggle('lose', !win);
+
+      overlay.classList.add('show');
+    }
+
+    function restartGame() {
+      // Reset state to new random match and clear messages
+      state.gameOver = false;
+      state.round = 1;
+      state.msgQueue = [];
+      state.isTyping = false;
+
+      const overlay = document.getElementById('result-overlay');
+      overlay.classList.remove('show');
+
+      document.getElementById('chat-feed').innerHTML = '';
+
+      startGame();
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    makeStars();
+    startGame();
+  </script>
 </body>
+
 </html>
