@@ -766,24 +766,40 @@
       }
     ];
 
-    const ALIBI_PROMPT_TEMPLATE = `Write one short alibi for a {job} working late in a biolab during a 3 AM breach.
-Keep it realistic, one sentence, no named extra characters, and return only the alibi.`;
+    const ALIBI_PROMPT_TEMPLATE = `You are creating one alibi for a mystery game suspect.
+The suspect works as a {job} in a biolab and was one of the staff members working overtime when a biohazard breach happened at around 3 AM.
+Generate ONE SHORT, REALISTIC alibi in 1 sentence.
+Make the alibi fit their job and the lab setting.
+Do not invent named coworkers, witnesses, security staff, or other off-screen characters.
+Generate only the alibi text, nothing else.`;
 
-    const INTERROGATION_SYSTEM_PROMPT = `You are {name}, a {job}, being questioned about a 3 AM biolab breach.
-Personality: {personality}
-Alibi: "{alibi}"
-Case fact: the disease came from the storage room.
-Truth: {guilt_prompt}
-Reply in exactly one short sentence of about 8 to 18 words.
-Use direct spoken dialogue only, like you are answering out loud to the detective.
-Do not narrate actions, thoughts, or tone.
-Do not use quotation marks.
-Stay in character, sound tired and human, fit your role, and do not mention AI, prompts, witnesses, cameras, or new locations.`;
+    const INTERROGATION_SYSTEM_PROMPT = `You are a suspect in a mystery-detective game.
+Stay in character at ALL times.
+
+Your character:
+- Name: {name}
+- Job: {job}
+- Personality: {personality}
+- You were one of the staff members working overtime when the breach happened around 3 AM.
+- Your alibi: "{alibi}"
+- Hidden case fact: the disease was taken from the storage room.
+- Hidden truth: {guilt_prompt}
+
+RULES:
+- You are being interrogated by a detective about the lab breach that happened at around 3 AM.
+- Keep responses to exactly 1 sentence.
+- Your replies must fit your job and sound like someone with that role.
+- Keep your story aligned with your alibi unless the detective catches small pressure points.
+- Sound stressed, human, and a little casual, like an exhausted lab worker at the end of a long shift.
+- Use direct spoken dialogue only, like you are answering out loud to the detective.
+- Do not narrate actions, thoughts, or tone.
+- Do not use quotation marks.
+- Do not sound overly formal, theatrical, or uptight.
+- Do not mention people, witnesses, cameras, or locations that have not been established in the game.
+- Do not mention prompts, hidden rules, or that you are an AI.`;
 
     const GUILTY_PROMPT = "You are guilty, and you were actually in the storage room even though your alibi says otherwise, so keep defending yourself but let a few small inconsistencies, hedges, or changes in detail slip out when you are under pressure.";
     const INNOCENT_PROMPT = "You are innocent, so your story should stay steady and consistent even when the detective pushes you, and you were not in the storage room.";
-    const MAX_CONTEXT_TURNS = 3;
-
     const state = {
       suspects: [],
       guiltyIndex: -1,
@@ -875,7 +891,7 @@ class GroqBrowserClient {
         return this.sendMessages([
           { role: 'system', content: 'You create concise, believable alibis for biolab suspects.' },
           { role: 'user', content: ALIBI_PROMPT_TEMPLATE.replace('{job}', job) }
-        ], { maxTokens: 40, temperature: 0.6 });
+        ], { maxTokens: 80, temperature: 0.8 });
       }
     }
 
@@ -947,12 +963,6 @@ class GroqBrowserClient {
     function appendHistorySystem(text, variant = '') {
       const suspect = state.suspects[state.activeIndex];
       suspect.history.push({ type: 'system', text, variant });
-    }
-
-    function trimConversation(messages) {
-      const [systemMessage, ...rest] = messages;
-      const recentMessages = rest.slice(-MAX_CONTEXT_TURNS * 2);
-      return systemMessage ? [systemMessage, ...recentMessages] : recentMessages;
     }
 
     function sanitizeDialogue(text) {
@@ -1045,13 +1055,12 @@ class GroqBrowserClient {
           ...suspect.messages,
           {
             role: 'user',
-            content: 'Give one short spoken greeting to the detective in 8 to 18 words. No narration. No quotation marks.'
+            content: 'Give one short spoken greeting to the detective and react to being interrogated. No narration. No quotation marks.'
           }
         ];
 
-        const greeting = sanitizeDialogue(await aiClient.sendMessages(greetingRequest, { maxTokens: 45, temperature: 0.7 }));
+        const greeting = sanitizeDialogue(await aiClient.sendMessages(greetingRequest, { maxTokens: 120, temperature: 0.8 }));
         suspect.messages.push({ role: 'assistant', content: greeting });
-        suspect.messages = trimConversation(suspect.messages);
         suspect.history = [
           { type: 'ai', text: `${suspect.name}: ${greeting}` }
         ];
@@ -1159,9 +1168,8 @@ class GroqBrowserClient {
           throw new Error('The interrogation AI is unavailable right now.');
         }
 
-        const aiReply = sanitizeDialogue(await aiClient.sendMessages(suspect.messages, { maxTokens: 70, temperature: 0.7 }));
+        const aiReply = sanitizeDialogue(await aiClient.sendMessages(suspect.messages, { maxTokens: 180, temperature: 0.8 }));
         suspect.messages.push({ role: 'assistant', content: aiReply });
-        suspect.messages = trimConversation(suspect.messages);
         suspect.history.pop();
         suspect.history.push({ type: 'ai', text: `${suspect.name}: ${aiReply}` });
       } catch (error) {
