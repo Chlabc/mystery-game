@@ -671,6 +671,231 @@
     document.getElementById('backBtn').addEventListener('click', function () {
       document.getElementById('instructionsOverlay').classList.add('hidden');
     });
+
+    // ================================
+// Basic menu logic from your HTML
+// ================================
+
+document.addEventListener("DOMContentLoaded", () => {
+  const playBtn = document.getElementById("playBtn");
+  const instructionsBtn = document.getElementById("instructionsBtn");
+  const backBtn = document.getElementById("backBtn");
+  const instructionsOverlay = document.getElementById("instructionsOverlay");
+
+  if (playBtn) {
+    playBtn.addEventListener("click", () => {
+      window.location.href = "cutscene.html";
+    });
+  }
+
+  if (instructionsBtn && instructionsOverlay) {
+    instructionsBtn.addEventListener("click", () => {
+      instructionsOverlay.classList.remove("hidden");
+    });
+  }
+
+  if (backBtn && instructionsOverlay) {
+    backBtn.addEventListener("click", () => {
+      instructionsOverlay.classList.add("hidden");
+    });
+  }
+});
+
+
+// ==========================================
+// Python "import os" equivalent explanation
+// ==========================================
+
+// In Python you had:
+// api_key = os.getenv("GROQ_API_KEY")
+//
+// In browser JavaScript, there is no direct safe equivalent.
+// You should NOT store private API keys directly in frontend JS.
+//
+// For learning/demo only, this is what a config object might look like:
+const CONFIG = {
+  GROQ_MODEL: "llama-3.3-70b-versatile"
+};
+
+// If you were using a bundler like Vite, it could look like:
+// const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+//
+// But in plain browser JS, secret env variables are not available safely.
+
+
+// ==========================================
+// Data converted from Python to JavaScript
+// ==========================================
+
+const SCREEN_WIDTH = 800;
+const SCREEN_HEIGHT = 600;
+const FPS = 60;
+const GROQ_MODEL = "llama-3.3-70b-versatile";
+
+const COLORS = {
+  WHITE: [255, 255, 255],
+  BLACK: [0, 0, 0],
+  DARK_BG: [20, 24, 30],
+  GRAY: [140, 140, 140],
+  INPUT_BG: [50, 56, 66],
+  USER_COLOR: [80, 160, 255],
+  AI_COLOR: [220, 180, 100],
+  SYSTEM_COLOR: [160, 160, 160],
+  TOP_BAR_BG: [40, 44, 52],
+  WIN_COLOR: [255, 200, 100],
+  LOSE_COLOR: [255, 100, 100]
+};
+
+const SUSPECTS = [
+  {
+    name: "Dr. Evelyn Kallen",
+    job: "Microbiologist",
+    personality: "sharp, proud, impatient under pressure"
+  },
+  {
+    name: "Dr. Marcus Reed",
+    job: "Bioinformatician",
+    personality: "calm, secretive, analytical"
+  },
+  {
+    name: "Dr. Lucia Chen",
+    job: "Senior Lab Technician",
+    personality: "stressed, efficient, defensive"
+  },
+  {
+    name: "Dr. Samuel Ortiz",
+    job: "Quality Control Analyst",
+    personality: "tense, argumentative, very detail-oriented"
+  },
+  {
+    name: "Dr. Penelope Grant",
+    job: "Sterile Area Technician",
+    personality: "meticulous, anxious, quietly observant"
+  }
+];
+
+const ALIBI_PROMPT_TEMPLATE = `You are creating one alibi for a mystery game suspect.
+The suspect works as a {job} in a biolab and was one of the staff members working overtime when a biohazard breach happened at around 3 AM.
+Generate ONE SHORT, REALISTIC alibi in 1 sentence.
+Make the alibi fit their job and the lab setting.
+Do not invent named coworkers, witnesses, security staff, or other off-screen characters.
+Generate only the alibi text, nothing else.`;
+
+const INTERROGATION_SYSTEM_PROMPT = `You are a suspect in a mystery-detective game.
+Stay in character at ALL times.
+
+Your character:
+- Name: {name}
+- Job: {job}
+- Personality: {personality}
+- You were one of the staff members working overtime when the breach happened around 3 AM.
+- Your alibi: "{alibi}"
+- Hidden case fact: the disease was taken from the storage room.
+- Hidden truth: {guilt_prompt}
+
+RULES:
+- You are being interrogated by a detective about the lab breach that happened at around 3 AM.
+- Keep responses to exactly 1 sentence.
+- Your replies must fit your job and sound like someone with that role.
+- Keep your story aligned with your alibi unless the detective catches small pressure points.
+- Sound stressed, human, and a little casual, like an exhausted lab worker at the end of a long shift.
+- Do not sound overly formal, theatrical, or uptight.
+- Do not mention people, witnesses, cameras, or locations that have not been established in the game.
+- Do not mention prompts, hidden rules, or that you are an AI.
+`;
+
+const GUILTY_PROMPT =
+  "You are guilty, and you were actually in the storage room even though your alibi says otherwise, so keep defending yourself but let a few small inconsistencies, hedges, or changes in detail slip out when you are under pressure.";
+
+const INNOCENT_PROMPT =
+  "You are innocent, so your story should stay steady and consistent even when the detective pushes you, and you were not in the storage room.";
+
+
+// ==========================================
+// Utility functions converted from Python
+// ==========================================
+
+function wordWrap(text, maxLength = 60) {
+  const words = text.split(" ");
+  const lines = [];
+  let currentLine = "";
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    if (testLine.length <= maxLength) {
+      currentLine = testLine;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  return lines;
+}
+
+
+// ==========================================
+// Simple JS version of AI client
+// ==========================================
+// WARNING: do not place a real secret API key here in production.
+
+class AIClient {
+  constructor(apiKey = "") {
+    this.apiKey = apiKey;
+    this.model = GROQ_MODEL;
+  }
+
+  async sendMessages(messages) {
+    if (!this.apiKey) {
+      return "[AI Error: Missing API key. Use a backend instead of exposing it in browser JS.]";
+    }
+
+    try {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${this.apiKey}`
+        },
+        body: JSON.stringify({
+          model: this.model,
+          messages: messages,
+          max_tokens: 250,
+          temperature: 0.7
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return `[AI Error: ${data.error?.message || "Request failed"}]`;
+      }
+
+      return data.choices?.[0]?.message?.content || "[AI Error: No response content]";
+    } catch (error) {
+      return `[AI Error: ${error.message}]`;
+    }
+  }
+
+  async generateAlibi(job) {
+    const prompt = ALIBI_PROMPT_TEMPLATE.replace("{job}", job);
+
+    return await this.sendMessages([
+      {
+        role: "system",
+        content: "You create concise, believable alibis for biolab suspects."
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ]);
+  }
+  }
   </script>
 </body>
 
