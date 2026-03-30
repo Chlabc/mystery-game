@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { apiKey, port } = require('./config');
@@ -68,6 +69,48 @@ function readRequestBody(req) {
   });
 }
 
+function postJson(url, headers, payload) {
+  return new Promise((resolve, reject) => {
+    const urlObject = new URL(url);
+    const request = https.request(
+      {
+        protocol: urlObject.protocol,
+        hostname: urlObject.hostname,
+        path: `${urlObject.pathname}${urlObject.search}`,
+        method: 'POST',
+        headers,
+      },
+      (response) => {
+        const chunks = [];
+
+        response.on('data', (chunk) => chunks.push(chunk));
+        response.on('end', () => {
+          const rawBody = chunks.length ? Buffer.concat(chunks).toString('utf8') : '';
+          let data = {};
+
+          if (rawBody) {
+            try {
+              data = JSON.parse(rawBody);
+            } catch {
+              data = { rawBody };
+            }
+          }
+
+          resolve({
+            ok: response.statusCode >= 200 && response.statusCode < 300,
+            status: response.statusCode || 500,
+            data,
+          });
+        });
+      }
+    );
+
+    request.on('error', reject);
+    request.write(JSON.stringify(payload));
+    request.end();
+  });
+}
+
 async function handleGroqChat(req, res) {
   if (!apiKey) {
     sendJson(res, 500, { error: 'GROQ_API_KEY is not configured on the server.' });
@@ -88,24 +131,24 @@ async function handleGroqChat(req, res) {
   }
 
   try {
-    const upstream = await fetch(GROQ_API_URL, {
-      method: 'POST',
-      headers: {
+    const upstream = await postJson(
+      GROQ_API_URL,
+      {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      {
         model: payload.model || 'llama-3.3-70b-versatile',
         messages: payload.messages,
         max_tokens: payload.maxTokens ?? 180,
         temperature: payload.temperature ?? 0.8,
-      }),
-    });
+      }
+    );
 
-    const data = await upstream.json().catch(() => ({}));
+    const data = upstream.data || {};
     if (!upstream.ok) {
       sendJson(res, upstream.status, {
-        error: data?.error?.message || `Groq request failed with status ${upstream.status}.`,
+        error: data?.error?.message || data?.rawBody || `Groq request failed with status ${upstream.status}.`,
       });
       return;
     }
