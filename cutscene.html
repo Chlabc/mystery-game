@@ -319,24 +319,6 @@
       padding: 10px 14px;
     }
 
-    .status-tag {
-      position: absolute;
-      right: 72px;
-      bottom: 64px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, rgba(0, 212, 255, 0.8), rgba(124, 58, 237, 0.8));
-      color: #0f0f1e;
-      border: 2px solid var(--accent);
-      font-size: 0.86rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      z-index: 4;
-      box-shadow: 0 0 30px rgba(0, 212, 255, 0.6), 0 8px 24px rgba(0, 0, 0, 0.4);
-      font-weight: 700;
-      font-family: 'IBM Plex Mono', monospace;
-    }
-
     .result-overlay {
       position: fixed;
       inset: 0;
@@ -452,11 +434,6 @@
         right: 36px;
       }
 
-      .status-tag {
-        right: 42px;
-        bottom: auto;
-        top: calc(38vh - 22px);
-      }
     }
   </style>
 </head>
@@ -465,7 +442,6 @@
   <div id="app">
     <img id="sceneBg" class="scene-bg" src="" alt="Scene" />
     <div class="scene-frame"></div>
-    <div class="status-tag">Quarantine Sector</div>
 
     <div class="left-ui">
       <div id="cutsceneBox" class="textbox">
@@ -595,8 +571,6 @@
     const timerEl = document.getElementById('timer');
     const promptRow = document.getElementById('promptRow');
     const progressWrap = document.getElementById('progressWrap');
-    const statusTag = document.querySelector('.status-tag');
-
     let sceneIndex = 0;
     let sceneTimeout = null;
     let dialogueIndex = 0;
@@ -706,7 +680,6 @@
       sceneIndex = 0;
       sceneBg.src = '';
       sceneText.textContent = '';
-      statusTag.classList.remove('hidden');
       cutsceneBox.classList.remove('hidden');
       nextBtn.classList.remove('hidden');
       skipBtn.classList.remove('hidden');

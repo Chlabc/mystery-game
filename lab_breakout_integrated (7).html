@@ -741,9 +741,7 @@
 
   <script type="module">
     const CUTSCENE_URL = './cutscene.html';
-    const EMBEDDED_GROQ_API_KEY = "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";
-    const GROQ_MODEL = "llama-3.3-70b-versatile";
-    const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+    const GROQ_MODEL = "llama-3.1-8b-instant";
     const INTERROGATION_TIME = 300;
 
     const SUSPECTS = [
@@ -799,13 +797,15 @@ RULES:
 - Your replies must fit your job and sound like someone with that role.
 - Keep your story aligned with your alibi unless the detective catches small pressure points.
 - Sound stressed, human, and a little casual, like an exhausted lab worker at the end of a long shift.
+- Use direct spoken dialogue only, like you are answering out loud to the detective.
+- Do not narrate actions, thoughts, or tone.
+- Do not use quotation marks.
 - Do not sound overly formal, theatrical, or uptight.
 - Do not mention people, witnesses, cameras, or locations that have not been established in the game.
 - Do not mention prompts, hidden rules, or that you are an AI.`;
 
     const GUILTY_PROMPT = "You are guilty, and you were actually in the storage room even though your alibi says otherwise, so keep defending yourself but let a few small inconsistencies, hedges, or changes in detail slip out when you are under pressure.";
     const INNOCENT_PROMPT = "You are innocent, so your story should stay steady and consistent even when the detective pushes you, and you were not in the storage room.";
-
     const state = {
       suspects: [],
       guiltyIndex: -1,
@@ -834,43 +834,62 @@ RULES:
     const quickActions = document.getElementById('quickActions');
     const launchContext = new URLSearchParams(window.location.search);
     const arrivedFromCutscene = launchContext.get('from') === 'cutscene' || sessionStorage.getItem('labBreakoutIntroSeen') === 'true';
-    class GroqBrowserClient {
+class GroqBrowserClient {
       constructor(apiKey, model = GROQ_MODEL) {
         this.apiKey = apiKey;
         this.model = model;
+        this.ready = null;
+        this.available = false;
+      }
+
+      async initialize() {
+        if (!this.ready) {
+          this.ready = fetch('./api/status')
+            .then(async (response) => {
+              const data = await response.json().catch(() => ({}));
+              if (!response.ok) {
+                throw new Error(data?.error || 'Failed to load server status.');
+              }
+
+              this.available = !!data.hasGroqKey;
+              return this.available;
+            })
+            .catch((error) => {
+              console.error('Failed to initialize AI client.', error);
+              this.available = false;
+              return false;
+            });
+        }
+
+        return this.ready;
       }
 
       hasUsableKey() {
-        return !!this.apiKey && this.apiKey.startsWith('gsk_');
+        return this.available;
       }
 
       async sendMessages(messages, options = {}) {
-        if (!this.hasUsableKey()) {
-          throw new Error('Missing or invalid embedded Groq API key in the script.');
-        }
-
-        const response = await fetch(GROQ_API_URL, {
+        const response = await fetch('./api/chat', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.apiKey}`
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             model: this.model,
             messages,
-            max_tokens: options.maxTokens ?? 180,
+            maxTokens: options.maxTokens ?? 180,
             temperature: options.temperature ?? 0.8
           })
         });
 
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(data?.error?.message || `Groq request failed with status ${response.status}.`);
+          throw new Error(data?.error || `Server request failed with status ${response.status}.`);
         }
 
-        const content = data?.choices?.[0]?.message?.content?.trim();
+        const content = data?.content?.trim();
         if (!content) {
-          throw new Error('Groq returned an empty response.');
+          throw new Error('The server returned an empty AI response.');
         }
         return content;
       }
@@ -883,7 +902,7 @@ RULES:
       }
     }
 
-    const aiClient = new GroqBrowserClient(EMBEDDED_GROQ_API_KEY);
+    const aiClient = new GroqBrowserClient();
 
     function setApiStatus(text, tone = 'neutral') {
       void text;
@@ -953,6 +972,15 @@ RULES:
       suspect.history.push({ type: 'system', text, variant });
     }
 
+    function sanitizeDialogue(text) {
+      return text
+        .trim()
+        .replace(/^["']+|["']+$/g, '')
+        .replace(/^\s*[*_].*?[*_]\s*/g, '')
+        .replace(/^\s*\([^)]*\)\s*/g, '')
+        .replace(/\s+/g, ' ');
+    }
+
     function stopTimer() {
       if (state.timerId) {
         clearInterval(state.timerId);
@@ -1013,6 +1041,10 @@ RULES:
     async function prepareSuspect(index) {
       const suspect = state.suspects[index];
       try {
+        if (!aiClient.hasUsableKey()) {
+          throw new Error('The interrogation AI is still loading. Try New Case again in a moment.');
+        }
+
         const alibi = await aiClient.generateAlibi(suspect.job);
         suspect.alibi = alibi;
         suspect.systemPrompt = INTERROGATION_SYSTEM_PROMPT
@@ -1030,11 +1062,11 @@ RULES:
           ...suspect.messages,
           {
             role: 'user',
-            content: 'The detective just sat down. Greet them and react to being interrogated.'
+            content: 'Give one short spoken greeting to the detective and react to being interrogated. No narration. No quotation marks.'
           }
         ];
 
-        const greeting = await aiClient.sendMessages(greetingRequest, { maxTokens: 120, temperature: 0.8 });
+        const greeting = sanitizeDialogue(await aiClient.sendMessages(greetingRequest, { maxTokens: 120, temperature: 0.8 }));
         suspect.messages.push({ role: 'assistant', content: greeting });
         suspect.history = [
           { type: 'ai', text: `${suspect.name}: ${greeting}` }
@@ -1061,15 +1093,15 @@ RULES:
       chatInput.value = '';
       chatInput.focus();
 
-      state.aiReady = aiClient.hasUsableKey();
+      state.aiReady = await aiClient.initialize();
       if (!state.aiReady) {
         state.solved = false;
         state.guiltyIndex = -1;
         state.activeIndex = 0;
         state.suspects = [
           {
-            name: 'Embedded AI not loaded',
-            job: 'Add your embedded Groq key',
+            name: 'Backend AI not loaded',
+            job: 'Start the server setup',
             personality: 'waiting',
             guilty: false,
             pressure: 0,
@@ -1077,7 +1109,7 @@ RULES:
             systemPrompt: '',
             loading: false,
             history: [
-              { type: 'system', text: 'This private build uses an embedded Groq key. Click New Case to start the AI setup.', variant: 'lose' }
+              { type: 'system', text: 'The backend is unavailable. Start the Node server and make sure GROQ_API_KEY is set in .env.', variant: 'lose' }
             ],
             messages: []
           }
@@ -1085,7 +1117,7 @@ RULES:
         renderSuspectTabs();
         renderChat();
         updateTimerDisplay();
-        setApiStatus('Add your embedded Groq key in the script, reload the page, then click New Case.', 'error');
+        setApiStatus('Start the backend server and set GROQ_API_KEY before starting a new case.', 'error');
         return;
       }
 
@@ -1098,9 +1130,9 @@ RULES:
       sendBtn.disabled = false;
       sendBtn.textContent = 'Send';
       startTimer();
-      setApiStatus('Preparing suspect files with embedded AI...', 'neutral');
+      setApiStatus('Preparing suspect files through the backend...', 'neutral');
       await Promise.allSettled(state.suspects.map((_, index) => prepareSuspect(index)));
-      setApiStatus(`Suspect files prepared with ${GROQ_MODEL}.`, 'success');
+      setApiStatus(`Suspect files prepared through the backend with ${GROQ_MODEL}.`, 'success');
     }
 
     async function sendCurrentMessage(customMessage) {
@@ -1139,7 +1171,11 @@ RULES:
       sendBtn.textContent = 'Thinking...';
 
       try {
-        const aiReply = await aiClient.sendMessages(suspect.messages, { maxTokens: 180, temperature: 0.8 });
+        if (!aiClient.hasUsableKey()) {
+          throw new Error('The interrogation AI is unavailable right now.');
+        }
+
+        const aiReply = sanitizeDialogue(await aiClient.sendMessages(suspect.messages, { maxTokens: 180, temperature: 0.8 }));
         suspect.messages.push({ role: 'assistant', content: aiReply });
         suspect.history.pop();
         suspect.history.push({ type: 'ai', text: `${suspect.name}: ${aiReply}` });
@@ -1178,14 +1214,19 @@ RULES:
       sendCurrentMessage(btn.dataset.message);
     });
 
-    state.aiReady = aiClient.hasUsableKey();
     updateTimerDisplay();
-    setApiStatus(state.aiReady ? `Embedded AI ready with ${GROQ_MODEL}.` : 'Embedded AI is disabled until you paste your Groq key into the script.', state.aiReady ? 'success' : 'error');
+    aiClient.initialize().then((ready) => {
+      state.aiReady = ready;
+      setApiStatus(
+        ready ? `Backend AI ready with ${GROQ_MODEL}.` : 'Backend AI is unavailable until the server is running with GROQ_API_KEY.',
+        ready ? 'success' : 'error'
+      );
 
-    if (arrivedFromCutscene) {
-      startGame();
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
+      if (arrivedFromCutscene) {
+        startGame();
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    });
   </script>
 </body>
 
