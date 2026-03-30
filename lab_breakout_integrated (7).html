@@ -735,7 +735,16 @@
 
   <script type="module">
     const CUTSCENE_URL = './cutscene.html';
-    const EMBEDDED_GROQ_API_KEY = "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";
+    // const EMBEDDED_GROQ_API_KEY = "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";
+    let EMBEDDED_GROQ_API_KEY = null;
+
+    // Fetch API key from backend endpoint (to be implemented)
+    async function fetchApiKey() {
+      const res = await fetch('/api/key');
+      if (!res.ok) throw new Error('Failed to load API key');
+      const data = await res.json();
+      EMBEDDED_GROQ_API_KEY = data.apiKey;
+    }
     const GROQ_MODEL = "llama-3.3-70b-versatile";
     const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
     const INTERROGATION_TIME = 300;
@@ -877,7 +886,10 @@ class GroqBrowserClient {
       }
     }
 
-    const aiClient = new GroqBrowserClient(EMBEDDED_GROQ_API_KEY);
+    let aiClient;
+    fetchApiKey().then(() => {
+      aiClient = new GroqBrowserClient(EMBEDDED_GROQ_API_KEY);
+    });
 
     function setApiStatus(text, tone = 'neutral') {
       void text;
